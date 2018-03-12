@@ -12,9 +12,16 @@ const char* APP_TITLE = "Hank";
 const int WIDTH = 1280;
 const int HEIGHT = 768;
 
+GLuint vbo = 0;
+GLuint vao = 0;
+
+
 bool init();
 void mainLoop();
 void cleanup();
+
+void initVertices();
+void draw();
 
 int main()
 {
@@ -23,6 +30,8 @@ int main()
 		cleanup();
 		return -1;
 	}
+
+	initVertices();
 	
 	mainLoop();
 	cleanup();
@@ -68,16 +77,53 @@ void mainLoop()
 	while (!glfwWindowShouldClose(gWindow))
 	{
 		glfwPollEvents();
+		draw();
 		glfwSwapBuffers(gWindow);
 	}
 }
 
 void cleanup()
 {
+	glDeleteBuffers(1, &vbo);
+	glDeleteVertexArrays(1, &vao);
+
+	vbo = 0;
+	vao = 0;
+
 	if (gWindow != nullptr)
 	{
 		glfwDestroyWindow(gWindow);
 	}
 
 	glfwTerminate();
+}
+
+void initVertices()
+{
+	GLfloat vertices[] = {
+		 0.0f,  0.5f,
+		 0.5f, -0.5f,
+		-0.5f, -0.5f
+	};
+
+	glGenBuffers(1, &vbo);
+	glGenVertexArrays(1, &vao);
+
+	glBindVertexArray(vao);
+	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+	// position attribute
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
+	glEnableVertexAttribArray(0);
+
+	glBindBuffer(1, 0);
+	glBindVertexArray(0);
+}
+
+void draw()
+{
+	glBindVertexArray(vao);
+	glDrawArrays(GL_TRIANGLES, 0, 3);
+	glBindVertexArray(0);
 }
