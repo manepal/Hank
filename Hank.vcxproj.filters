@@ -24,9 +24,15 @@
     <ClCompile Include="src\ShaderProgram.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Texture2D.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\ShaderProgram.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Texture2D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -35,6 +41,12 @@
       <Filter>Shaders</Filter>
     </None>
     <None Include="shaders\basic.vert.glsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="shaders\texture.vert.glsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="shaders\texture.frag.glsl">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>

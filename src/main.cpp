@@ -3,11 +3,10 @@
 #include <GLFW\glfw3.h>
 #include <glm\glm.hpp>
 
-
 #include <iostream>
 
 #include "ShaderProgram.h"
-
+#include "Texture2D.h"
 
 GLFWwindow* gWindow;
 const char* APP_TITLE = "Hank";
@@ -19,6 +18,8 @@ GLuint ibo = 0;
 GLuint vao = 0;
 
 ShaderProgram gShaderProgram;
+const std::string texturePath = "textures/jump.png";
+Texture2D gTexture;
 
 bool init();
 void mainLoop();
@@ -37,7 +38,8 @@ int main()
 
 	initVertices();
 
-	gShaderProgram.loadShaders("shaders/basic.vert.glsl", "shaders/basic.frag.glsl");
+	gShaderProgram.loadShaders("shaders/texture.vert.glsl", "shaders/texture.frag.glsl");
+	gTexture.loadTexture(texturePath);
 	
 	mainLoop();
 	cleanup();
@@ -109,11 +111,11 @@ void cleanup()
 void initVertices()
 {
 	GLfloat vertices[] = {
-		// position		// color
-		-0.5f, 0.5f, 1.0f, 0.0f, 0.0f,	// top left
-		 0.5f, 0.5f, 0.0f, 1.0f, 0.0f,	// top right
-		 0.5f,-0.5f, 0.0f, 0.0f, 1.0f,	// bottom right
-		-0.5f,-0.5f, 1.0f, 1.0f, 0.0f	// bottom left
+		// position	 // texture coordinates
+		-0.5f, 0.5f, 0.0f, 1.0f,	// top left
+		 0.5f, 0.5f, 0.5f, 1.0f,	// top right
+		 0.5f,-0.5f, 0.5f, 0.0f,	// bottom right
+		-0.5f,-0.5f, 0.0f, 0.0f		// bottom left
 	};
 
 	GLuint indices[] = {
@@ -134,11 +136,12 @@ void initVertices()
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
 	// position attribute
-	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), nullptr);
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), nullptr);
 	glEnableVertexAttribArray(0);
 
-	// color attribute
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)(2 * sizeof(GLfloat)));
+
+	// texcoords
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), (GLvoid*)(2 * sizeof(GLfloat)));
 	glEnableVertexAttribArray(1);
 
 	glBindBuffer(1, 0);
@@ -147,13 +150,22 @@ void initVertices()
 
 void draw()
 {
+	glClearColor(0.0f, 0.2f, 0.3f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
 	glBindVertexArray(vao);
+
 	gShaderProgram.use();
 
 	float time = glfwGetTime();
 
+	gTexture.bind(0);
 	gShaderProgram.setUniform("time", time);
 
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+	gTexture.unbind(0);
 	glBindVertexArray(0);
 }
