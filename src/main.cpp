@@ -9,7 +9,7 @@
 
 GLFWwindow* gWindow;
 const char* APP_TITLE = "Hank";
-const int WIDTH = 1280;
+const int WIDTH = 1080;
 const int HEIGHT = 768;
 
 GLuint vbo = 0;
