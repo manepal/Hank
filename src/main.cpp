@@ -6,6 +6,8 @@
 
 #include <iostream>
 
+#include "ShaderProgram.h"
+
 
 GLFWwindow* gWindow;
 const char* APP_TITLE = "Hank";
@@ -16,6 +18,7 @@ GLuint vbo = 0;
 GLuint ibo = 0;
 GLuint vao = 0;
 
+ShaderProgram gShaderProgram;
 
 bool init();
 void mainLoop();
@@ -33,6 +36,8 @@ int main()
 	}
 
 	initVertices();
+
+	gShaderProgram.loadShaders("shaders/basic.vert.glsl", "shaders/basic.frag.glsl");
 	
 	mainLoop();
 	cleanup();
@@ -104,10 +109,11 @@ void cleanup()
 void initVertices()
 {
 	GLfloat vertices[] = {
-		-0.5f, 0.5f,	// top left
-		 0.5f, 0.5f,	// top right
-		 0.5f,-0.5f,	// bottom right
-		-0.5f,-0.5f		// bottom left
+		// position		// color
+		-0.5f, 0.5f, 1.0f, 0.0f, 0.0f,	// top left
+		 0.5f, 0.5f, 0.0f, 1.0f, 0.0f,	// top right
+		 0.5f,-0.5f, 0.0f, 0.0f, 1.0f,	// bottom right
+		-0.5f,-0.5f, 1.0f, 1.0f, 0.0f	// bottom left
 	};
 
 	GLuint indices[] = {
@@ -128,8 +134,12 @@ void initVertices()
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
 	// position attribute
-	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), nullptr);
 	glEnableVertexAttribArray(0);
+
+	// color attribute
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)(2 * sizeof(GLfloat)));
+	glEnableVertexAttribArray(1);
 
 	glBindBuffer(1, 0);
 	glBindVertexArray(0);
@@ -138,6 +148,12 @@ void initVertices()
 void draw()
 {
 	glBindVertexArray(vao);
+	gShaderProgram.use();
+
+	float time = glfwGetTime();
+
+	gShaderProgram.setUniform("time", time);
+
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 	glBindVertexArray(0);
 }
