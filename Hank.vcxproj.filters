@@ -27,12 +27,18 @@
     <ClCompile Include="src\Texture2D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Camera.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\ShaderProgram.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Texture2D.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Camera.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -43,10 +49,10 @@
     <None Include="shaders\basic.vert.glsl">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="shaders\texture.vert.glsl">
+    <None Include="shaders\shader.frag.glsl">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="shaders\texture.frag.glsl">
+    <None Include="shaders\shader.vert.glsl">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>

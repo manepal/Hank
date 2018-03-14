@@ -2,11 +2,13 @@
 #include <GL\glew.h>
 #include <GLFW\glfw3.h>
 #include <glm\glm.hpp>
+#include <glm\gtc\matrix_transform.hpp>
 
 #include <iostream>
 
 #include "ShaderProgram.h"
 #include "Texture2D.h"
+#include "Camera.h"
 
 GLFWwindow* gWindow;
 const char* APP_TITLE = "Hank";
@@ -18,14 +20,22 @@ GLuint ibo = 0;
 GLuint vao = 0;
 
 ShaderProgram gShaderProgram;
-const std::string texturePath = "textures/jump.png";
-Texture2D gTexture;
+const std::string hankTexturePath = "textures/jump.png";
+Texture2D hankTexture;
+const std::string coinTexturePath = "textures/coin.png";
+Texture2D coinTexture;
+
+Camera gCamera;
+
+glm::vec3 spritePos = glm::vec3(0.0f);
+const float MOVE_SPEED = 0.05f;
 
 bool init();
 void mainLoop();
 void cleanup();
 
 void initVertices();
+void update(float dt);
 void draw();
 
 int main()
@@ -38,8 +48,9 @@ int main()
 
 	initVertices();
 
-	gShaderProgram.loadShaders("shaders/texture.vert.glsl", "shaders/texture.frag.glsl");
-	gTexture.loadTexture(texturePath);
+	gShaderProgram.loadShaders("shaders/shader.vert.glsl", "shaders/shader.frag.glsl");
+	hankTexture.loadTexture(hankTexturePath);
+	coinTexture.loadTexture(coinTexturePath);
 	
 	mainLoop();
 	cleanup();
@@ -85,8 +96,8 @@ void mainLoop()
 	while (!glfwWindowShouldClose(gWindow))
 	{
 		glfwPollEvents();
+		update(0.05f);
 		draw();
-		glfwSwapBuffers(gWindow);
 	}
 }
 
@@ -112,13 +123,13 @@ void initVertices()
 {
 	GLfloat vertices[] = {
 		// position	 // texture coordinates
-		-0.5f, 0.5f, 0.0f, 1.0f,	// top left
-		 0.5f, 0.5f, 0.5f, 1.0f,	// top right
-		 0.5f,-0.5f, 0.5f, 0.0f,	// bottom right
-		-0.5f,-0.5f, 0.0f, 0.0f		// bottom left
+		-1.0f, 1.0f, 0.0f, 1.0f,	// top left
+		 1.0f, 1.0f, 0.5f, 1.0f,	// top right
+		 1.0f,-1.0f, 0.5f, 0.0f,	// bottom right
+		-1.0f,-1.0f, 0.0f, 0.0f		// bottom left
 	};
 
-	GLuint indices[] = {
+	GLushort indices[] = {
 		0, 1, 2,	// first triangle
 		2, 3, 0		// secont triangle
 	};
@@ -148,24 +159,80 @@ void initVertices()
 	glBindVertexArray(0);
 }
 
+void update(float dt)
+{
+	/*
+		- control player movement with directional keys.
+					UP
+
+			 LEFT  DOWN  RIGHT
+	*/
+	if (glfwGetKey(gWindow, GLFW_KEY_RIGHT) == GLFW_PRESS) spritePos.x += MOVE_SPEED * dt;
+	else if (glfwGetKey(gWindow, GLFW_KEY_LEFT) == GLFW_PRESS) spritePos.x -= MOVE_SPEED * dt;
+
+	if (glfwGetKey(gWindow, GLFW_KEY_UP) == GLFW_PRESS) spritePos.y += MOVE_SPEED * dt;
+	else if (glfwGetKey(gWindow, GLFW_KEY_DOWN) == GLFW_PRESS) spritePos.y -= MOVE_SPEED * dt;
+
+	/*
+		- control camera movement with WASD keys.
+					W
+				  A S D
+		- zoom camera with
+			l-shift
+			l-ctrl
+	*/
+	if (glfwGetKey(gWindow, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) gCamera.setFOV(gCamera.getFOV() - 0.05f * dt);
+	else if (glfwGetKey(gWindow, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) gCamera.setFOV(gCamera.getFOV() + 0.05f * dt);
+
+	if (glfwGetKey(gWindow, GLFW_KEY_W) == GLFW_PRESS) gCamera.move(0.0f, -MOVE_SPEED * dt);
+	else if (glfwGetKey(gWindow, GLFW_KEY_S) == GLFW_PRESS) gCamera.move(0.0f, MOVE_SPEED * dt);
+	
+	if (glfwGetKey(gWindow, GLFW_KEY_A) == GLFW_PRESS) gCamera.move(MOVE_SPEED * dt, 0.0f);
+	else if (glfwGetKey(gWindow, GLFW_KEY_D) == GLFW_PRESS) gCamera.move(-MOVE_SPEED * dt, 0.0f);
+}
+
 void draw()
 {
-	glClearColor(0.0f, 0.2f, 0.3f, 1.0f);
+	glClearColor(0.0f, 0.5f, 0.8f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+
+	glm::mat4 model;
+	glm::mat4 view;
+	glm::mat4 projection;
+
+	model = glm::translate(model, glm::vec3(0.0f));
+	view = gCamera.getViewMatrix();
+	projection = gCamera.getProjectionMatrix((float)WIDTH, (float)HEIGHT);
+
 	glBindVertexArray(vao);
+
+	//glDrawArrays(GL_LINE_LOOP, 0, 4);
 
 	gShaderProgram.use();
 
-	float time = glfwGetTime();
+	gShaderProgram.setUniform("model", model);
+	gShaderProgram.setUniform("view", view);
+	gShaderProgram.setUniform("projection", projection);
 
-	gTexture.bind(0);
-	gShaderProgram.setUniform("time", time);
+	coinTexture.bind(0);
 
-	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, 0);
 
-	gTexture.unbind(0);
+	coinTexture.unbind(0);
+	hankTexture.bind(0);
+
+
+	model = glm::translate(glm::mat4(), spritePos);
+
+	gShaderProgram.setUniform("model", model);
+
+	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, 0);
+
+	hankTexture.unbind(0);
 	glBindVertexArray(0);
+
+	glfwSwapBuffers(gWindow);
 }
