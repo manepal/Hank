@@ -7,7 +7,7 @@
 #include <iostream>
 
 #include "ShaderProgram.h"
-#include "Texture2D.h"
+#include "Sprite.h"
 #include "Camera.h"
 
 GLFWwindow* gWindow;
@@ -15,26 +15,20 @@ const char* APP_TITLE = "Hank";
 const int WIDTH = 1080;
 const int HEIGHT = 768;
 
-GLuint vbo = 0;
-GLuint ibo = 0;
-GLuint vao = 0;
-
 ShaderProgram gShaderProgram;
-const std::string hankTexturePath = "textures/jump.png";
-Texture2D hankTexture;
-const std::string coinTexturePath = "textures/coin.png";
-Texture2D coinTexture;
+Sprite marioSprite("textures/mario.png");
+Sprite coinSprite("textures/coin.png");
 
 Camera gPerspectiveCamera;
 
-glm::vec3 spritePos = glm::vec3(0.0f);
+glm::vec3 marioPos = glm::vec3(0.0f);
+glm::vec3 coinPos = glm::vec3(0.0f);
 const float MOVE_SPEED = 0.05f;
 
 bool init();
 void mainLoop();
 void cleanup();
 
-void initVertices();
 void update(float dt);
 void draw();
 
@@ -46,12 +40,10 @@ int main()
 		return -1;
 	}
 
-	initVertices();
-
 	gShaderProgram.loadShaders("shaders/shader.vert.glsl", "shaders/shader.frag.glsl");
-	hankTexture.loadTexture(hankTexturePath);
-	coinTexture.loadTexture(coinTexturePath);
-	
+	marioSprite.load();
+	coinSprite.load();
+
 	mainLoop();
 	cleanup();
 
@@ -103,14 +95,6 @@ void mainLoop()
 
 void cleanup()
 {
-	glDeleteBuffers(1, &vbo);
-	glDeleteBuffers(1, &ibo);
-	glDeleteVertexArrays(1, &vao);
-
-	vbo = 0;
-	ibo = 0;
-	vao = 0;
-
 	if (gWindow != nullptr)
 	{
 		glfwDestroyWindow(gWindow);
@@ -119,59 +103,24 @@ void cleanup()
 	glfwTerminate();
 }
 
-void initVertices()
-{
-	GLfloat vertices[] = {
-		// position	 // texture coordinates
-		-1.0f, 1.0f, 0.0f, 1.0f,	// top left
-		 1.0f, 1.0f, 0.5f, 1.0f,	// top right
-		 1.0f,-1.0f, 0.5f, 0.0f,	// bottom right
-		-1.0f,-1.0f, 0.0f, 0.0f		// bottom left
-	};
-
-	GLushort indices[] = {
-		0, 1, 2,	// first triangle
-		2, 3, 0		// secont triangle
-	};
-
-	glGenBuffers(1, &vbo);
-	glGenBuffers(1, &ibo);
-	glGenVertexArrays(1, &vao);
-
-	glBindVertexArray(vao);
-	
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-
-	// position attribute
-	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), nullptr);
-	glEnableVertexAttribArray(0);
-
-
-	// texcoords
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), (GLvoid*)(2 * sizeof(GLfloat)));
-	glEnableVertexAttribArray(1);
-
-	glBindBuffer(1, 0);
-	glBindVertexArray(0);
-}
-
 void update(float dt)
 {
+	if (glfwGetKey(gWindow, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+	{
+		glfwSetWindowShouldClose(gWindow, GL_TRUE);
+	}
+
 	/*
 		- control player movement with directional keys.
 					UP
 
 			 LEFT  DOWN  RIGHT
 	*/
-	if (glfwGetKey(gWindow, GLFW_KEY_RIGHT) == GLFW_PRESS) spritePos.x += MOVE_SPEED * dt;
-	else if (glfwGetKey(gWindow, GLFW_KEY_LEFT) == GLFW_PRESS) spritePos.x -= MOVE_SPEED * dt;
+	if (glfwGetKey(gWindow, GLFW_KEY_RIGHT) == GLFW_PRESS) marioPos.x += MOVE_SPEED * dt;
+	else if (glfwGetKey(gWindow, GLFW_KEY_LEFT) == GLFW_PRESS) marioPos.x -= MOVE_SPEED * dt;
 
-	if (glfwGetKey(gWindow, GLFW_KEY_UP) == GLFW_PRESS) spritePos.y += MOVE_SPEED * dt;
-	else if (glfwGetKey(gWindow, GLFW_KEY_DOWN) == GLFW_PRESS) spritePos.y -= MOVE_SPEED * dt;
+	if (glfwGetKey(gWindow, GLFW_KEY_UP) == GLFW_PRESS) marioPos.y += MOVE_SPEED * dt;
+	else if (glfwGetKey(gWindow, GLFW_KEY_DOWN) == GLFW_PRESS) marioPos.y -= MOVE_SPEED * dt;
 
 	/*
 		- control camera movement with WASD keys.
@@ -198,41 +147,28 @@ void draw()
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-
 	glm::mat4 model;
 	glm::mat4 view;
 	glm::mat4 projection;
 
-	model = glm::translate(model, glm::vec3(0.0f));
+	// first render coin sprite
+	model = glm::translate(model, coinPos);
 	view = gPerspectiveCamera.getViewMatrix();
 	projection = gPerspectiveCamera.getPerspective((float)WIDTH, (float)HEIGHT);
 
-	glBindVertexArray(vao);
-
-	//glDrawArrays(GL_LINE_LOOP, 0, 4);
-
 	gShaderProgram.use();
-
 	gShaderProgram.setUniform("model", model);
 	gShaderProgram.setUniform("view", view);
 	gShaderProgram.setUniform("projection", projection);
 
-	coinTexture.bind(0);
+	coinSprite.draw();
 
-	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, 0);
-
-	coinTexture.unbind(0);
-	hankTexture.bind(0);
-
-
-	model = glm::translate(glm::mat4(), spritePos);
+	// now draw mario sprite
+	model = glm::translate(glm::mat4(), marioPos);
 
 	gShaderProgram.setUniform("model", model);
-
-	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, 0);
-
-	hankTexture.unbind(0);
-	glBindVertexArray(0);
+	
+	marioSprite.draw();
 
 	glfwSwapBuffers(gWindow);
 }
