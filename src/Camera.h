@@ -11,7 +11,7 @@ public:
 	~Camera();
 
 	glm::mat4 getViewMatrix() const;
-	glm::mat4 getProjectionMatrix(float width, float height) const;
+	glm::mat4 getPerspective(float width, float height) const;
 
 	void move(float x, float y);
 

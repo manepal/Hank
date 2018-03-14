@@ -25,7 +25,7 @@ Texture2D hankTexture;
 const std::string coinTexturePath = "textures/coin.png";
 Texture2D coinTexture;
 
-Camera gCamera;
+Camera gPerspectiveCamera;
 
 glm::vec3 spritePos = glm::vec3(0.0f);
 const float MOVE_SPEED = 0.05f;
@@ -181,14 +181,14 @@ void update(float dt)
 			l-shift
 			l-ctrl
 	*/
-	if (glfwGetKey(gWindow, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) gCamera.setFOV(gCamera.getFOV() - 0.05f * dt);
-	else if (glfwGetKey(gWindow, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) gCamera.setFOV(gCamera.getFOV() + 0.05f * dt);
+	if (glfwGetKey(gWindow, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) gPerspectiveCamera.setFOV(gPerspectiveCamera.getFOV() - 0.05f * dt);
+	else if (glfwGetKey(gWindow, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) gPerspectiveCamera.setFOV(gPerspectiveCamera.getFOV() + 0.05f * dt);
 
-	if (glfwGetKey(gWindow, GLFW_KEY_W) == GLFW_PRESS) gCamera.move(0.0f, -MOVE_SPEED * dt);
-	else if (glfwGetKey(gWindow, GLFW_KEY_S) == GLFW_PRESS) gCamera.move(0.0f, MOVE_SPEED * dt);
+	if (glfwGetKey(gWindow, GLFW_KEY_W) == GLFW_PRESS) gPerspectiveCamera.move(0.0f, -MOVE_SPEED * dt);
+	else if (glfwGetKey(gWindow, GLFW_KEY_S) == GLFW_PRESS) gPerspectiveCamera.move(0.0f, MOVE_SPEED * dt);
 	
-	if (glfwGetKey(gWindow, GLFW_KEY_A) == GLFW_PRESS) gCamera.move(MOVE_SPEED * dt, 0.0f);
-	else if (glfwGetKey(gWindow, GLFW_KEY_D) == GLFW_PRESS) gCamera.move(-MOVE_SPEED * dt, 0.0f);
+	if (glfwGetKey(gWindow, GLFW_KEY_A) == GLFW_PRESS) gPerspectiveCamera.move(MOVE_SPEED * dt, 0.0f);
+	else if (glfwGetKey(gWindow, GLFW_KEY_D) == GLFW_PRESS) gPerspectiveCamera.move(-MOVE_SPEED * dt, 0.0f);
 }
 
 void draw()
@@ -204,8 +204,8 @@ void draw()
 	glm::mat4 projection;
 
 	model = glm::translate(model, glm::vec3(0.0f));
-	view = gCamera.getViewMatrix();
-	projection = gCamera.getProjectionMatrix((float)WIDTH, (float)HEIGHT);
+	view = gPerspectiveCamera.getViewMatrix();
+	projection = gPerspectiveCamera.getPerspective((float)WIDTH, (float)HEIGHT);
 
 	glBindVertexArray(vao);
 
