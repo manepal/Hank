@@ -9,7 +9,7 @@
 #include "Sprite.h"
 
 
-const float MAX_FPS = 60;
+const float MAX_FPS = 1000.0f;
 
 Sprite marioSprite("textures/mario.png");
 Sprite coinSprite("textures/coin.png");
@@ -192,12 +192,20 @@ void Application::showFPS()
 	static float previousTime = glfwGetTime();
 	
 	float currentTime;
-	currentTime = glfwGetTime();
 
-	mFrameTime = currentTime - previousTime;
-	frameTimes[currentFrame % NUM_SAMPLES] = mFrameTime;
+	// ---------- limit fps to max fps ----------
+	do
+	{
+		currentTime = glfwGetTime();
+		mFrameTime = currentTime - previousTime;
+	}
+	while (mFrameTime < 1.0f / MAX_FPS);
+	// ------------------------------------------
+
 	previousTime = currentTime;
 
+	frameTimes[currentFrame % NUM_SAMPLES] = mFrameTime;
+	
 	int numFrames;
 	currentFrame++;
 	if (currentFrame < NUM_SAMPLES)
@@ -223,15 +231,23 @@ void Application::showFPS()
 	}
 	else
 	{
-		mFPS = 100.0f;
+		mFPS = 0.0f;
 	}
 
-	// display fps
-	std::ostringstream outs;
-	outs.precision(3);
-	outs << std::fixed
-		<< mAppTitle << ": " << mWindowWidth << "x" << mWindowHeight << "    "
-		<< "FPS: " << mFPS << "   ";
-	
-	glfwSetWindowTitle(mWindow, outs.str().c_str());
+	// display fps twice every second
+	static float lastPrint = currentTime;
+	float elapsedTime = currentTime - lastPrint;
+
+	if (elapsedTime >= 0.5f)
+	{
+		std::ostringstream outs;
+		outs.precision(3);
+		outs << std::fixed
+			<< mAppTitle << ": " << mWindowWidth << "x" << mWindowHeight << "    "
+			<< "FPS: " << mFPS << "   ";
+
+		glfwSetWindowTitle(mWindow, outs.str().c_str());
+
+		lastPrint = currentTime;
+	}
 }
