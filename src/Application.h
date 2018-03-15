@@ -29,13 +29,17 @@ private:
 	ShaderProgram mShaderProgram;
 	Camera mCamera;
 
+	float mFPS;
+	float mFrameTime;
+
 	bool initialize();
 	void mainLoop();
 	void cleanup();
 
 	void loadResources();
-	void update(float dt);
+	void update(double dt);
 	void draw();
+	void showFPS();
 };
 
 

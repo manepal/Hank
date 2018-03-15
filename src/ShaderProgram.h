@@ -16,6 +16,7 @@ public:
 
 	bool loadShaders(const char* vsFilename, const char* fsFilename);
 	void use();
+	void unUse();
 
 	void setUniformSampler(const GLchar* name, GLint& slot);
 	void setUniform(const GLchar* name, GLfloat& f);

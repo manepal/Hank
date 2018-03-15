@@ -57,6 +57,11 @@ void ShaderProgram::use()
 	}
 }
 
+void ShaderProgram::unUse()
+{
+	glUseProgram(0);
+}
+
 void ShaderProgram::setUniformSampler(const GLchar * name, GLint& slot)
 {
 	glActiveTexture(GL_TEXTURE0 + slot);

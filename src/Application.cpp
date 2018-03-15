@@ -1,17 +1,23 @@
 #include "Application.h"
 
 #include <iostream>
+#include <sstream>
 
 #include <glm\glm.hpp>
 #include <glm\gtc\matrix_transform.hpp>
 
 #include "Sprite.h"
+
+
+const float MAX_FPS = 60;
+
 Sprite marioSprite("textures/mario.png");
 Sprite coinSprite("textures/coin.png");
 
 glm::vec3 marioPos = glm::vec3(0.0f);
 glm::vec3 coinPos = glm::vec3(0.0f);
-const float MOVE_SPEED = 0.05f;
+const float MOVE_SPEED = 10.0f;
+const float ZOOM_SPEED = 2.0f;
 
 
 Application::Application(const std::string& appTitle, int windowWidth, int windowHeight):
@@ -77,8 +83,12 @@ void Application::mainLoop()
 	while (!glfwWindowShouldClose(mWindow))
 	{
 		glfwPollEvents();
-		update(0.1);
+
+		float currentFrameTime = glfwGetTime();
+
+		update(mFrameTime);
 		draw();
+		showFPS();
 	}
 }
 
@@ -100,7 +110,7 @@ void Application::loadResources()
 	coinSprite.load();
 }
 
-void Application::update(float dt)
+void Application::update(double dt)
 {
 	if (glfwGetKey(mWindow, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 	{
@@ -127,8 +137,8 @@ void Application::update(float dt)
 	l-shift
 	l-ctrl
 	*/
-	if (glfwGetKey(mWindow, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) mCamera.setFOV(mCamera.getFOV() - 0.05f * dt);
-	else if (glfwGetKey(mWindow, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) mCamera.setFOV(mCamera.getFOV() + 0.05f * dt);
+	if (glfwGetKey(mWindow, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) mCamera.setFOV(mCamera.getFOV() - ZOOM_SPEED * dt);
+	else if (glfwGetKey(mWindow, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) mCamera.setFOV(mCamera.getFOV() + ZOOM_SPEED * dt);
 
 	if (glfwGetKey(mWindow, GLFW_KEY_W) == GLFW_PRESS) mCamera.move(0.0f, -MOVE_SPEED * dt);
 	else if (glfwGetKey(mWindow, GLFW_KEY_S) == GLFW_PRESS) mCamera.move(0.0f, MOVE_SPEED * dt);
@@ -158,8 +168,10 @@ void Application::draw()
 	mShaderProgram.setUniform("view", view);
 	mShaderProgram.setUniform("projection", projection);
 
-	coinSprite.draw();
-
+	for (int i = 0; i < 1000; i++)
+	{
+		coinSprite.draw();
+	}
 	// now draw mario sprite
 	model = glm::translate(glm::mat4(), marioPos);
 
@@ -167,5 +179,59 @@ void Application::draw()
 
 	marioSprite.draw();
 
+	mShaderProgram.unUse();
 	glfwSwapBuffers(mWindow);
+}
+
+void Application::showFPS()
+{
+	static const int NUM_SAMPLES = 10;
+	static float frameTimes[NUM_SAMPLES];
+	static int currentFrame = 0;
+
+	static float previousTime = glfwGetTime();
+	
+	float currentTime;
+	currentTime = glfwGetTime();
+
+	mFrameTime = currentTime - previousTime;
+	frameTimes[currentFrame % NUM_SAMPLES] = mFrameTime;
+	previousTime = currentTime;
+
+	int numFrames;
+	currentFrame++;
+	if (currentFrame < NUM_SAMPLES)
+	{
+		numFrames = currentFrame;
+	}
+	else
+	{
+		numFrames = NUM_SAMPLES;
+	}
+
+	float frameTimeAverage = 0;
+	for (int i = 0; i < numFrames; i++)
+	{
+		frameTimeAverage += frameTimes[i];
+	}
+	frameTimeAverage = frameTimeAverage / numFrames;
+
+	if (frameTimeAverage > 0)
+	{
+		// time  is in seconds divide 1 frame by average time taken to render 1 frame
+		mFPS = 1.0f/ frameTimeAverage;
+	}
+	else
+	{
+		mFPS = 100.0f;
+	}
+
+	// display fps
+	std::ostringstream outs;
+	outs.precision(3);
+	outs << std::fixed
+		<< mAppTitle << ": " << mWindowWidth << "x" << mWindowHeight << "    "
+		<< "FPS: " << mFPS << "   ";
+	
+	glfwSetWindowTitle(mWindow, outs.str().c_str());
 }
