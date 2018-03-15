@@ -71,12 +71,11 @@ void Sprite::load()
 
 void Sprite::draw()
 {
-	if (!mIsLoaded)
+	/*if (!mIsLoaded)
 	{
-		std::cerr << "texture '" << mTexturePath << "' not loaded! sprite will not be drawn!" << std::endl;
 		return;
 	}
-
+	*/
 	glBindVertexArray(mVAO);
 	mTexture.bind(0);
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, 0);
