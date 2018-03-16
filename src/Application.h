@@ -24,8 +24,7 @@ private:
 	int mWindowWidth;
 	int mWindowHeight;
 	std::string mAppTitle;
-
-	Window* mWindow;
+	bool mIsFullscreen;
 
 	ShaderProgram mShaderProgram;
 	Camera mCamera;

@@ -23,18 +23,13 @@ const float ZOOM_SPEED = 2.0f;
 Application::Application(const std::string& appTitle, int windowWidth, int windowHeight, bool fullscreen):
 	mAppTitle(appTitle),
 	mWindowWidth(windowWidth),
-	mWindowHeight(windowHeight)
+	mWindowHeight(windowHeight),
+	mIsFullscreen(fullscreen)
 {
-	mWindow = new Window(mAppTitle, mWindowWidth, mWindowHeight, fullscreen);
 }
 
 Application::~Application()
 {
-	if (mWindow != nullptr)
-	{
-		delete mWindow;
-		mWindow = nullptr;
-	}
 }
 
 void Application::run()
@@ -59,7 +54,7 @@ bool Application::initialize()
 		return false;
 	}
 
-	if (!mWindow->initialize())
+	if (!Window::getInstance()->initialize(mAppTitle, mWindowWidth, mWindowHeight, mIsFullscreen))
 	{
 		cleanup();
 		return false;
@@ -77,7 +72,7 @@ bool Application::initialize()
 
 void Application::mainLoop()
 {
-	while (!glfwWindowShouldClose(mWindow->getWindowHandle()))
+	while (!glfwWindowShouldClose(Window::getInstance()->getWindowHandle()))
 	{
 		glfwPollEvents();
 
@@ -91,8 +86,6 @@ void Application::mainLoop()
 
 void Application::cleanup()
 {
-	delete mWindow;
-	mWindow = nullptr;
 	glfwTerminate();
 }
 
@@ -105,22 +98,17 @@ void Application::loadResources()
 
 void Application::update(double dt)
 {
-	if (glfwGetKey(mWindow->getWindowHandle(), GLFW_KEY_ESCAPE) == GLFW_PRESS)
-	{
-		mWindow->close();
-	}
-
 	/*
 	- control player movement with directional keys.
 	UP
 
 	LEFT  DOWN  RIGHT
 	*/
-	if (glfwGetKey(mWindow->getWindowHandle(), GLFW_KEY_RIGHT) == GLFW_PRESS) marioPos.x += MOVE_SPEED * dt;
-	else if (glfwGetKey(mWindow->getWindowHandle(), GLFW_KEY_LEFT) == GLFW_PRESS) marioPos.x -= MOVE_SPEED * dt;
+	if (glfwGetKey(Window::getInstance()->getWindowHandle(), GLFW_KEY_RIGHT) == GLFW_PRESS) marioPos.x += MOVE_SPEED * dt;
+	else if (glfwGetKey(Window::getInstance()->getWindowHandle(), GLFW_KEY_LEFT) == GLFW_PRESS) marioPos.x -= MOVE_SPEED * dt;
 
-	if (glfwGetKey(mWindow->getWindowHandle(), GLFW_KEY_UP) == GLFW_PRESS) marioPos.y += MOVE_SPEED * dt;
-	else if (glfwGetKey(mWindow->getWindowHandle(), GLFW_KEY_DOWN) == GLFW_PRESS) marioPos.y -= MOVE_SPEED * dt;
+	if (glfwGetKey(Window::getInstance()->getWindowHandle(), GLFW_KEY_UP) == GLFW_PRESS) marioPos.y += MOVE_SPEED * dt;
+	else if (glfwGetKey(Window::getInstance()->getWindowHandle(), GLFW_KEY_DOWN) == GLFW_PRESS) marioPos.y -= MOVE_SPEED * dt;
 
 	/*
 	- control camera movement with WASD keys.
@@ -130,14 +118,14 @@ void Application::update(double dt)
 	l-shift
 	l-ctrl
 	*/
-	if (glfwGetKey(mWindow->getWindowHandle(), GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) mCamera.setFOV(mCamera.getFOV() - ZOOM_SPEED * dt);
-	else if (glfwGetKey(mWindow->getWindowHandle(), GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) mCamera.setFOV(mCamera.getFOV() + ZOOM_SPEED * dt);
+	if (glfwGetKey(Window::getInstance()->getWindowHandle(), GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) mCamera.setFOV(mCamera.getFOV() - ZOOM_SPEED * dt);
+	else if (glfwGetKey(Window::getInstance()->getWindowHandle(), GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) mCamera.setFOV(mCamera.getFOV() + ZOOM_SPEED * dt);
 
-	if (glfwGetKey(mWindow->getWindowHandle(), GLFW_KEY_W) == GLFW_PRESS) mCamera.move(0.0f, -MOVE_SPEED * dt);
-	else if (glfwGetKey(mWindow->getWindowHandle(), GLFW_KEY_S) == GLFW_PRESS) mCamera.move(0.0f, MOVE_SPEED * dt);
+	if (glfwGetKey(Window::getInstance()->getWindowHandle(), GLFW_KEY_W) == GLFW_PRESS) mCamera.move(0.0f, -MOVE_SPEED * dt);
+	else if (glfwGetKey(Window::getInstance()->getWindowHandle(), GLFW_KEY_S) == GLFW_PRESS) mCamera.move(0.0f, MOVE_SPEED * dt);
 
-	if (glfwGetKey(mWindow->getWindowHandle(), GLFW_KEY_A) == GLFW_PRESS) mCamera.move(MOVE_SPEED * dt, 0.0f);
-	else if (glfwGetKey(mWindow->getWindowHandle(), GLFW_KEY_D) == GLFW_PRESS) mCamera.move(-MOVE_SPEED * dt, 0.0f);
+	if (glfwGetKey(Window::getInstance()->getWindowHandle(), GLFW_KEY_A) == GLFW_PRESS) mCamera.move(MOVE_SPEED * dt, 0.0f);
+	else if (glfwGetKey(Window::getInstance()->getWindowHandle(), GLFW_KEY_D) == GLFW_PRESS) mCamera.move(-MOVE_SPEED * dt, 0.0f);
 }
 
 void Application::draw()
@@ -154,7 +142,7 @@ void Application::draw()
 	// first render coin sprite
 	model = glm::translate(model, coinPos);
 	view = mCamera.getViewMatrix();
-	projection = mCamera.getPerspective((float)mWindowWidth, (float)mWindowHeight);
+	projection = mCamera.getPerspective((float)Window::getInstance()->getWidth(), (float)Window::getInstance()->getHeight());
 
 	mShaderProgram.use();
 	mShaderProgram.setUniform("model", model);
@@ -173,7 +161,7 @@ void Application::draw()
 	marioSprite.draw();
 
 	mShaderProgram.unUse();
-	glfwSwapBuffers(mWindow->getWindowHandle());
+	glfwSwapBuffers(Window::getInstance()->getWindowHandle());
 }
 
 void Application::showFPS()
@@ -239,7 +227,7 @@ void Application::showFPS()
 			<< ": " << mWindowWidth << "x" << mWindowHeight << "    "
 			<< "FPS: " << mFPS << "   ";
 
-		mWindow->appendTitle(outs.str());
+		Window::getInstance()->appendTitle(outs.str());
 
 		lastPrint = currentTime;
 	}
