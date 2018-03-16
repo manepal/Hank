@@ -2,8 +2,7 @@
 
 #include <iostream>
 
-Sprite::Sprite(const std::string& texturePath) :
-	mTexturePath(texturePath),
+Sprite::Sprite() :
 	mIsLoaded(false),
 	mVBO(0),
 	mIBO(0),
@@ -22,14 +21,19 @@ Sprite::~Sprite()
 	mVAO = 0;
 }
 
-void Sprite::load()
+void Sprite::load(const std::string& texturePath)
 {
-	mIsLoaded = mTexture.loadTexture(mTexturePath);
+	mTexturePath = texturePath;
+
+	// pass width and height as out parameters;
+	mIsLoaded = mTexture.loadTexture(mTexturePath, &mWidth, &mHeight);
 	if (!mIsLoaded)
 	{
 		std::cerr << "texture '" << mTexturePath << "' not loaded! sprite will not be initialized!" << std::endl;
 		return;
 	}
+
+	std::cout << mTexturePath << ": " << mWidth << "x" << mHeight << std::endl;
 
 	GLfloat vertices[] = {
 		// position	 // texture coordinates
@@ -81,4 +85,14 @@ void Sprite::draw()
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, 0);
 	mTexture.unbind(0);
 	glBindVertexArray(0);
+}
+
+int Sprite::getWidth() const
+{
+	return mWidth;
+}
+
+int Sprite::getHeight() const
+{
+	return mHeight;
 }

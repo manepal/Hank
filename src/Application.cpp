@@ -11,8 +11,17 @@
 
 const float MAX_FPS = 1000.0f;
 
-Sprite marioSprite("textures/mario.png");
-Sprite coinSprite("textures/coin.png");
+Sprite marioSprite;
+Sprite coinSprite;
+
+// ------------- animation prototyping ----------
+const int NUM_SPRITES = 16;
+
+Sprite coinSprites[NUM_SPRITES];
+float animationinterval = 0.05f;
+
+int currentFrame = 0;
+// ----------------------------------------------
 
 glm::vec3 marioPos = glm::vec3(0.0f);
 glm::vec3 coinPos = glm::vec3(0.0f);
@@ -92,8 +101,17 @@ void Application::cleanup()
 void Application::loadResources()
 {
 	mShaderProgram.loadShaders("shaders/shader.vert.glsl", "shaders/shader.frag.glsl");
-	marioSprite.load();
-	coinSprite.load();
+	marioSprite.load("textures/mario.png");
+	coinSprite.load("textures/coin.png");
+
+	// ------------- animation prototyping ----------
+	for (int i = 0; i < NUM_SPRITES; i++)
+	{
+		int imageNumber = i + 1;
+		std::string imagePath = "textures/coin_animation/image_" + std::to_string(imageNumber) + ".png";
+		coinSprites[i].load(imagePath);
+	}
+	// ----------------------------------------------
 }
 
 void Application::update(double dt)
@@ -126,6 +144,20 @@ void Application::update(double dt)
 
 	if (glfwGetKey(Window::getInstance()->getWindowHandle(), GLFW_KEY_A) == GLFW_PRESS) mCamera.move(MOVE_SPEED * dt, 0.0f);
 	else if (glfwGetKey(Window::getInstance()->getWindowHandle(), GLFW_KEY_D) == GLFW_PRESS) mCamera.move(-MOVE_SPEED * dt, 0.0f);
+
+
+
+	// ---------- animation prototyping ----------
+	static float previousTime = glfwGetTime();
+	float currentTime = glfwGetTime();
+	float elapsedTime = currentTime - previousTime;
+	if (elapsedTime >= animationinterval)
+	{
+		currentFrame++;
+		currentFrame %= NUM_SPRITES;
+		previousTime = currentTime;
+	}
+	// -------------------------------------------
 }
 
 void Application::draw()
@@ -140,7 +172,10 @@ void Application::draw()
 	glm::mat4 projection;
 
 	// first render coin sprite
-	model = glm::translate(model, coinPos);
+	//  calculate scale for coin sprites
+	float scaleX = coinSprites[currentFrame].getWidth() / (float)coinSprites[currentFrame].getHeight();
+	
+	model = glm::translate(model, coinPos) * glm::scale(model, glm::vec3(scaleX, 1.0f, 1.0f));
 	view = mCamera.getViewMatrix();
 	projection = mCamera.getPerspective((float)Window::getInstance()->getWidth(), (float)Window::getInstance()->getHeight());
 
@@ -149,10 +184,16 @@ void Application::draw()
 	mShaderProgram.setUniform("view", view);
 	mShaderProgram.setUniform("projection", projection);
 
-	for (int i = 0; i < 1000; i++)
+	/*for (int i = 0; i < 1000; i++)
 	{
 		coinSprite.draw();
-	}
+	}*/
+
+	// ---------- animation prototyping ----------
+	coinSprites[currentFrame].draw();
+	// -------------------------------------------
+
+
 	// now draw mario sprite
 	model = glm::translate(glm::mat4(), marioPos);
 

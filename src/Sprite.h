@@ -12,14 +12,19 @@
 class Sprite
 {
 public:
-	Sprite(const std::string& texturePath);
+	Sprite();
 	~Sprite();
 
-	void load();
+	void load(const std::string& texturePath);
 	void draw();
+
+	int getWidth() const;
+	int getHeight() const;
 
 private:
 	std::string mTexturePath;
+	int mWidth;
+	int mHeight;
 	bool mIsLoaded;
 
 	Texture2D mTexture;
