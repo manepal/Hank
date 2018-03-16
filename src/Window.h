@@ -12,6 +12,7 @@
 class Window
 {
 public:
+	// returns singleton instance of window
 	static Window* getInstance();
 
 	bool initialize(const std::string&  title, int width, int height, bool fullscreen = false);
