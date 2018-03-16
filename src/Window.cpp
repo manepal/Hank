@@ -30,8 +30,18 @@ bool Window::initialize(const std::string&  title, int width, int height, bool f
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
+	GLFWmonitor* monitor = nullptr;
 
-	mWindow = glfwCreateWindow(mWidth, mHeight, mTitle.c_str(), nullptr, nullptr);
+	if (mIsFullscreen)
+	{
+		monitor = glfwGetPrimaryMonitor();
+		const GLFWvidmode* vMode = glfwGetVideoMode(monitor);
+
+		mWidth = vMode->width;
+		mHeight = vMode->height;
+	}
+	// create window
+	mWindow = glfwCreateWindow(mWidth, mHeight, mTitle.c_str(), monitor, nullptr);
 	if (mWindow == nullptr)
 	{
 		std::cerr << "failed to create window!" << std::endl;
