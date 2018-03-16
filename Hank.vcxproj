@@ -25,6 +25,7 @@
     <ClCompile Include="src\ShaderProgram.cpp" />
     <ClCompile Include="src\Sprite.cpp" />
     <ClCompile Include="src\Texture2D.cpp" />
+    <ClCompile Include="src\Window.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Application.h" />
@@ -32,6 +33,7 @@
     <ClInclude Include="src\ShaderProgram.h" />
     <ClInclude Include="src\Sprite.h" />
     <ClInclude Include="src\Texture2D.h" />
+    <ClInclude Include="src\Window.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\basic.frag.glsl" />

@@ -20,15 +20,21 @@ const float MOVE_SPEED = 10.0f;
 const float ZOOM_SPEED = 2.0f;
 
 
-Application::Application(const std::string& appTitle, int windowWidth, int windowHeight):
+Application::Application(const std::string& appTitle, int windowWidth, int windowHeight, bool fullscreen):
 	mAppTitle(appTitle),
 	mWindowWidth(windowWidth),
 	mWindowHeight(windowHeight)
 {
+	mWindow = new Window(mAppTitle, mWindowWidth, mWindowHeight, fullscreen);
 }
 
 Application::~Application()
 {
+	if (mWindow != nullptr)
+	{
+		delete mWindow;
+		mWindow = nullptr;
+	}
 }
 
 void Application::run()
@@ -53,20 +59,11 @@ bool Application::initialize()
 		return false;
 	}
 
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-
-
-	mWindow = glfwCreateWindow(mWindowWidth, mWindowHeight, mAppTitle.c_str(), nullptr, nullptr);
-	if (mWindow == nullptr)
+	if (!mWindow->initialize())
 	{
-		std::cerr << "failed to create window!" << std::endl;
+		cleanup();
 		return false;
 	}
-
-	glfwMakeContextCurrent(mWindow);
 
 	glewExperimental = GL_TRUE;
 	if (GLEW_OK != glewInit())
@@ -80,7 +77,7 @@ bool Application::initialize()
 
 void Application::mainLoop()
 {
-	while (!glfwWindowShouldClose(mWindow))
+	while (!glfwWindowShouldClose(mWindow->getWindowHandle()))
 	{
 		glfwPollEvents();
 
@@ -94,12 +91,8 @@ void Application::mainLoop()
 
 void Application::cleanup()
 {
-	if (mWindow != nullptr)
-	{
-		glfwDestroyWindow(mWindow);
-		mWindow = nullptr;
-	}
-
+	delete mWindow;
+	mWindow = nullptr;
 	glfwTerminate();
 }
 
@@ -112,9 +105,9 @@ void Application::loadResources()
 
 void Application::update(double dt)
 {
-	if (glfwGetKey(mWindow, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+	if (glfwGetKey(mWindow->getWindowHandle(), GLFW_KEY_ESCAPE) == GLFW_PRESS)
 	{
-		glfwSetWindowShouldClose(mWindow, GL_TRUE);
+		mWindow->close();
 	}
 
 	/*
@@ -123,11 +116,11 @@ void Application::update(double dt)
 
 	LEFT  DOWN  RIGHT
 	*/
-	if (glfwGetKey(mWindow, GLFW_KEY_RIGHT) == GLFW_PRESS) marioPos.x += MOVE_SPEED * dt;
-	else if (glfwGetKey(mWindow, GLFW_KEY_LEFT) == GLFW_PRESS) marioPos.x -= MOVE_SPEED * dt;
+	if (glfwGetKey(mWindow->getWindowHandle(), GLFW_KEY_RIGHT) == GLFW_PRESS) marioPos.x += MOVE_SPEED * dt;
+	else if (glfwGetKey(mWindow->getWindowHandle(), GLFW_KEY_LEFT) == GLFW_PRESS) marioPos.x -= MOVE_SPEED * dt;
 
-	if (glfwGetKey(mWindow, GLFW_KEY_UP) == GLFW_PRESS) marioPos.y += MOVE_SPEED * dt;
-	else if (glfwGetKey(mWindow, GLFW_KEY_DOWN) == GLFW_PRESS) marioPos.y -= MOVE_SPEED * dt;
+	if (glfwGetKey(mWindow->getWindowHandle(), GLFW_KEY_UP) == GLFW_PRESS) marioPos.y += MOVE_SPEED * dt;
+	else if (glfwGetKey(mWindow->getWindowHandle(), GLFW_KEY_DOWN) == GLFW_PRESS) marioPos.y -= MOVE_SPEED * dt;
 
 	/*
 	- control camera movement with WASD keys.
@@ -137,14 +130,14 @@ void Application::update(double dt)
 	l-shift
 	l-ctrl
 	*/
-	if (glfwGetKey(mWindow, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) mCamera.setFOV(mCamera.getFOV() - ZOOM_SPEED * dt);
-	else if (glfwGetKey(mWindow, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) mCamera.setFOV(mCamera.getFOV() + ZOOM_SPEED * dt);
+	if (glfwGetKey(mWindow->getWindowHandle(), GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) mCamera.setFOV(mCamera.getFOV() - ZOOM_SPEED * dt);
+	else if (glfwGetKey(mWindow->getWindowHandle(), GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) mCamera.setFOV(mCamera.getFOV() + ZOOM_SPEED * dt);
 
-	if (glfwGetKey(mWindow, GLFW_KEY_W) == GLFW_PRESS) mCamera.move(0.0f, -MOVE_SPEED * dt);
-	else if (glfwGetKey(mWindow, GLFW_KEY_S) == GLFW_PRESS) mCamera.move(0.0f, MOVE_SPEED * dt);
+	if (glfwGetKey(mWindow->getWindowHandle(), GLFW_KEY_W) == GLFW_PRESS) mCamera.move(0.0f, -MOVE_SPEED * dt);
+	else if (glfwGetKey(mWindow->getWindowHandle(), GLFW_KEY_S) == GLFW_PRESS) mCamera.move(0.0f, MOVE_SPEED * dt);
 
-	if (glfwGetKey(mWindow, GLFW_KEY_A) == GLFW_PRESS) mCamera.move(MOVE_SPEED * dt, 0.0f);
-	else if (glfwGetKey(mWindow, GLFW_KEY_D) == GLFW_PRESS) mCamera.move(-MOVE_SPEED * dt, 0.0f);
+	if (glfwGetKey(mWindow->getWindowHandle(), GLFW_KEY_A) == GLFW_PRESS) mCamera.move(MOVE_SPEED * dt, 0.0f);
+	else if (glfwGetKey(mWindow->getWindowHandle(), GLFW_KEY_D) == GLFW_PRESS) mCamera.move(-MOVE_SPEED * dt, 0.0f);
 }
 
 void Application::draw()
@@ -180,7 +173,7 @@ void Application::draw()
 	marioSprite.draw();
 
 	mShaderProgram.unUse();
-	glfwSwapBuffers(mWindow);
+	glfwSwapBuffers(mWindow->getWindowHandle());
 }
 
 void Application::showFPS()
@@ -243,10 +236,10 @@ void Application::showFPS()
 		std::ostringstream outs;
 		outs.precision(3);
 		outs << std::fixed
-			<< mAppTitle << ": " << mWindowWidth << "x" << mWindowHeight << "    "
+			<< ": " << mWindowWidth << "x" << mWindowHeight << "    "
 			<< "FPS: " << mFPS << "   ";
 
-		glfwSetWindowTitle(mWindow, outs.str().c_str());
+		mWindow->appendTitle(outs.str());
 
 		lastPrint = currentTime;
 	}

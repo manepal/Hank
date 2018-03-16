@@ -10,11 +10,12 @@
 
 #include "Camera.h"
 #include "ShaderProgram.h"
+#include "Window.h"
 
 class Application
 {
 public:
-	 Application(const std::string& appTitle, int windowWidth, int windowHeight);
+	 Application(const std::string& appTitle, int windowWidth, int windowHeight, bool fullscreen = false);
 	~Application();
 
 	void run();
@@ -24,7 +25,7 @@ private:
 	int mWindowHeight;
 	std::string mAppTitle;
 
-	GLFWwindow* mWindow;
+	Window* mWindow;
 
 	ShaderProgram mShaderProgram;
 	Camera mCamera;
