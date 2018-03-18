@@ -3,6 +3,7 @@
 #include <iostream>
 
 #include "Vertex.h"
+#include "ResourceManager.h"
 
 
 GLushort Sprite::mIndices[6] = {
@@ -34,12 +35,15 @@ void Sprite::load(const std::string& texturePath)
 	mTexturePath = texturePath;
 
 	// pass width and height as out parameters;
-	mIsLoaded = mTexture.loadTexture(mTexturePath, &mWidth, &mHeight);
+	mTexture = ResourceManager::getTexture(texturePath);
+	mIsLoaded = mTexture != nullptr;
 	if (!mIsLoaded)
 	{
 		std::cerr << "texture '" << mTexturePath << "' not loaded! sprite will not be initialized!" << std::endl;
 		return;
 	}
+
+	std::cout << "'" << mTexturePath << "':" << mTexture->getWidth() << "x" << mTexture->getHeight() << std::endl;
 
 	Vertex vertices[4];
 	// top left
@@ -98,18 +102,8 @@ void Sprite::draw()
 	}
 	*/
 	glBindVertexArray(mVAO);
-	mTexture.bind(0);
+	mTexture->bind(0);
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, 0);
-	mTexture.unbind(0);
+	mTexture->unbind(0);
 	glBindVertexArray(0);
-}
-
-int Sprite::getWidth() const
-{
-	return mWidth;
-}
-
-int Sprite::getHeight() const
-{
-	return mHeight;
 }

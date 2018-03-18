@@ -11,12 +11,18 @@ public:
 	Texture2D();
 	virtual ~Texture2D();
 
-	bool loadTexture(const std::string& filename, int* width, int* height, bool generateMipmaps = true);
+	bool loadTexture(const std::string& filename, bool generateMipmaps = true);
 	void bind(GLuint texUnit = 0);
 	void unbind(GLuint texUnit = 0);
 
+	// getters
+	int getWidth();
+	int getHeight();
+
 private:
 	GLuint mTexture;
+	int mWidth;
+	int mHeight;
 };
 
 

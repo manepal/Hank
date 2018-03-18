@@ -15,9 +15,7 @@ Sprite marioSprite;
 Sprite coinSprite;
 
 // ----------------- animation ------------------
-const int NUM_SPRITES = 16;
-Animation coinAnimation(0.05f);
-// ----------------------------------------------
+Animation animation(0.25f);
 
 glm::vec3 marioPos = glm::vec3(0.0f);
 glm::vec3 coinPos = glm::vec3(0.0f);
@@ -100,20 +98,15 @@ void Application::loadResources()
 	marioSprite.load("textures/mario.png");
 	coinSprite.load("textures/coin.png");
 
-	// ------------- animation prototyping ----------
-	for (int i = 0; i < NUM_SPRITES; i++)
-	{
-		int imageNumber = i + 1;
-		std::string imagePath = "textures/coin_animation/image_" + std::to_string(imageNumber) + ".png";
-
-		coinAnimation.addFrame(imagePath);
-	}
-	// ----------------------------------------------
+	animation.addFrame("textures/animation/switchLeft.png");
+	animation.addFrame("textures/animation/switchMid.png");
+	animation.addFrame("textures/animation/switchRight.png");
+	animation.addFrame("textures/animation/switchMid.png");
 }
 
 void Application::update(double dt)
 {
-	coinAnimation.update(dt);
+	animation.update(dt);
 
 	/*
 	- control player movement with directional keys.
@@ -178,10 +171,9 @@ void Application::draw()
 
 	//coinSprite.draw();
 
-	// ---------- animation prototyping ----------
-	coinAnimation.draw();
-	// -------------------------------------------
-
+	// ---------- animation ----------
+	animation.draw();
+	
 
 	// now draw mario sprite
 	model = glm::translate(glm::mat4(), marioPos);

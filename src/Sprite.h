@@ -6,6 +6,7 @@
 #include <glm\glm.hpp>
 
 #include <string>
+#include <memory>
 
 #include "Texture2D.h"
 
@@ -18,16 +19,11 @@ public:
 	void load(const std::string& texturePath);
 	void draw();
 
-	int getWidth() const;
-	int getHeight() const;
-
 private:
 	std::string mTexturePath;
-	int mWidth;
-	int mHeight;
 	bool mIsLoaded;
 
-	Texture2D mTexture;
+	std::shared_ptr<Texture2D> mTexture;
 
 	GLuint mVBO;
 	GLuint mIBO;

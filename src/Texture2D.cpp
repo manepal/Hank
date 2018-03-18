@@ -15,11 +15,11 @@ Texture2D::~Texture2D()
 	mTexture = 0;
 }
 
-bool Texture2D::loadTexture(const std::string & filename, int * width, int * height, bool generateMipmaps)
+bool Texture2D::loadTexture(const std::string & filename, bool generateMipmaps)
 {
 	int components;
 
-	unsigned char* imageData = stbi_load(filename.c_str(), width, height, &components, STBI_rgb_alpha);
+	unsigned char* imageData = stbi_load(filename.c_str(), &mWidth, &mHeight, &components, STBI_rgb_alpha);
 	if (imageData == nullptr)
 	{
 		std::cerr << "error loading texture /'" << filename << "/'!" << std::endl;
@@ -27,15 +27,15 @@ bool Texture2D::loadTexture(const std::string & filename, int * width, int * hei
 	}
 
 	// Invert image
-	int widthInBytes = *width * 4;
+	int widthInBytes = mWidth * 4;
 	unsigned char *top = nullptr;
 	unsigned char *bottom = nullptr;
 	unsigned char temp = 0;
-	int halfHeight = *height / 2;
+	int halfHeight = mHeight / 2;
 	for (int row = 0; row < halfHeight; row++)
 	{
 		top = imageData + row * widthInBytes;
-		bottom = imageData + (*height - row - 1) * widthInBytes;
+		bottom = imageData + (mHeight - row - 1) * widthInBytes;
 		for (int col = 0; col < widthInBytes; col++)
 		{
 			temp = *top;
@@ -54,7 +54,7 @@ bool Texture2D::loadTexture(const std::string & filename, int * width, int * hei
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, *width, *height, 0, GL_RGBA, GL_UNSIGNED_BYTE, imageData);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, mWidth, mHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, imageData);
 
 	if (generateMipmaps)
 	{
@@ -78,4 +78,14 @@ void Texture2D::unbind(GLuint texUnit)
 {
 	glActiveTexture(GL_TEXTURE0 + texUnit);
 	glBindTexture(GL_TEXTURE_2D, 0);
+}
+
+int Texture2D::getWidth()
+{
+	return mWidth;
+}
+
+int Texture2D::getHeight()
+{
+	return mHeight;
 }
