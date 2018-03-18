@@ -6,7 +6,7 @@
 #include <glm\glm.hpp>
 #include <glm\gtc\matrix_transform.hpp>
 
-#include "Sprite.h"
+#include "Animation.h"
 
 
 const float MAX_FPS = 1000.0f;
@@ -14,13 +14,9 @@ const float MAX_FPS = 1000.0f;
 Sprite marioSprite;
 Sprite coinSprite;
 
-// ------------- animation prototyping ----------
+// ----------------- animation ------------------
 const int NUM_SPRITES = 16;
-
-Sprite coinSprites[NUM_SPRITES];
-float animationinterval = 0.05f;
-
-int currentFrame = 0;
+Animation coinAnimation(0.05f);
 // ----------------------------------------------
 
 glm::vec3 marioPos = glm::vec3(0.0f);
@@ -109,13 +105,16 @@ void Application::loadResources()
 	{
 		int imageNumber = i + 1;
 		std::string imagePath = "textures/coin_animation/image_" + std::to_string(imageNumber) + ".png";
-		coinSprites[i].load(imagePath);
+
+		coinAnimation.addFrame(imagePath);
 	}
 	// ----------------------------------------------
 }
 
 void Application::update(double dt)
 {
+	coinAnimation.update(dt);
+
 	/*
 	- control player movement with directional keys.
 	UP
@@ -144,20 +143,6 @@ void Application::update(double dt)
 
 	if (glfwGetKey(Window::getInstance()->getWindowHandle(), GLFW_KEY_A) == GLFW_PRESS) mCamera.move(MOVE_SPEED * dt, 0.0f);
 	else if (glfwGetKey(Window::getInstance()->getWindowHandle(), GLFW_KEY_D) == GLFW_PRESS) mCamera.move(-MOVE_SPEED * dt, 0.0f);
-
-
-
-	// ---------- animation prototyping ----------
-	static float previousTime = glfwGetTime();
-	float currentTime = glfwGetTime();
-	float elapsedTime = currentTime - previousTime;
-	if (elapsedTime >= animationinterval)
-	{
-		currentFrame++;
-		currentFrame %= NUM_SPRITES;
-		previousTime = currentTime;
-	}
-	// -------------------------------------------
 }
 
 void Application::draw()
@@ -173,9 +158,9 @@ void Application::draw()
 
 	// first render coin sprite
 	//  calculate scale for coin sprites
-	float scaleX = coinSprites[currentFrame].getWidth() / (float)coinSprites[currentFrame].getHeight();
+	//float scaleX = coinSprites[currentFrame].getWidth() / (float)coinSprites[currentFrame].getHeight();
 	
-	model = glm::translate(model, coinPos) * glm::scale(model, glm::vec3(scaleX, 1.0f, 1.0f));
+	model = glm::translate(model, coinPos);// *glm::scale(model, glm::vec3(scaleX, 1.0f, 1.0f));
 	view = mCamera.getViewMatrix();
 	projection = mCamera.getPerspective((float)Window::getInstance()->getWidth(), (float)Window::getInstance()->getHeight());
 
@@ -184,13 +169,17 @@ void Application::draw()
 	mShaderProgram.setUniform("view", view);
 	mShaderProgram.setUniform("projection", projection);
 
-	/*for (int i = 0; i < 1000; i++)
+	/*
+	for (int i = 0; i < 1000; i++)
 	{
 		coinSprite.draw();
-	}*/
+	}
+	*/
+
+	//coinSprite.draw();
 
 	// ---------- animation prototyping ----------
-	coinSprites[currentFrame].draw();
+	coinAnimation.draw();
 	// -------------------------------------------
 
 
@@ -265,7 +254,7 @@ void Application::showFPS()
 		std::ostringstream outs;
 		outs.precision(3);
 		outs << std::fixed
-			<< ": " << mWindowWidth << "x" << mWindowHeight << "    "
+			<< ": " << Window::getInstance()->getWidth() << "x" << Window::getInstance()->getHeight() << "    "
 			<< "FPS: " << mFPS << "   ";
 
 		Window::getInstance()->appendTitle(outs.str());

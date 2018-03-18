@@ -33,8 +33,6 @@ void Sprite::load(const std::string& texturePath)
 		return;
 	}
 
-	std::cout << mTexturePath << ": " << mWidth << "x" << mHeight << std::endl;
-
 	GLfloat vertices[] = {
 		// position	 // texture coordinates
 		-1.0f, 1.0f, 0.0f, 1.0f,	// top left
