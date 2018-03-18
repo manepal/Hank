@@ -34,6 +34,8 @@ private:
 	GLuint mVAO;
 
 	glm::vec3 mPosition;
+
+	static GLushort mIndices[6];
 };
 
 
