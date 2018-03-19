@@ -21,7 +21,8 @@ public:
 
 private:
 	std::string mTexturePath;
-	bool mIsLoaded;
+	int mWidth;
+	int mHeight;
 
 	std::shared_ptr<Texture2D> mTexture;
 

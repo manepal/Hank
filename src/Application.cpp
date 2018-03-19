@@ -20,11 +20,13 @@ AnimationController animController;
 std::shared_ptr<Animation> switchAnimation(new Animation(0.5f));
 std::shared_ptr<Animation> flagAnimation(new Animation(0.25f));
 std::shared_ptr<Animation> flyAnimation(new Animation(0.125f));
+std::shared_ptr<Animation> coninAnimation(new Animation(0.05f));
+
 
 glm::vec3 marioPos = glm::vec3(0.0f);
 glm::vec3 coinPos = glm::vec3(0.0f);
-const float MOVE_SPEED = 10.0f;
-const float ZOOM_SPEED = 2.0f;
+const float MOVE_SPEED = 100.0f;
+const float ZOOM_SPEED = 50.0f;
 
 
 Application::Application(const std::string& appTitle, int windowWidth, int windowHeight, bool fullscreen):
@@ -113,6 +115,13 @@ void Application::loadResources()
 	flyAnimation->addFrame("textures/animation/flyFly1.png");
 	flyAnimation->addFrame("textures/animation/flyFly2.png");
 
+	for (int i = 0; i < 16; i++)
+	{
+		std::string imagePath = "textures/animation/coin_" + std::to_string(i) + ".png";
+		coninAnimation->addFrame(imagePath);
+	}
+
+	animController.addAnimation("coin", coninAnimation);
 	animController.addAnimation("switch", switchAnimation);
 	animController.addAnimation("fly", flyAnimation);
 	animController.addAnimation("flag", flagAnimation);
@@ -120,7 +129,8 @@ void Application::loadResources()
 
 void Application::update(double dt)
 {
-	// use J, K, L to toggle animation
+	// use I, J, K, L to toggle animation
+	if (glfwGetKey(Window::getInstance()->getWindowHandle(), GLFW_KEY_I) == GLFW_PRESS) animController.setActiveAnimation("coin");
 	if (glfwGetKey(Window::getInstance()->getWindowHandle(), GLFW_KEY_J) == GLFW_PRESS) animController.setActiveAnimation("switch");
 	if (glfwGetKey(Window::getInstance()->getWindowHandle(), GLFW_KEY_K) == GLFW_PRESS) animController.setActiveAnimation("flag");
 	if (glfwGetKey(Window::getInstance()->getWindowHandle(), GLFW_KEY_L) == GLFW_PRESS) animController.setActiveAnimation("fly");
@@ -145,8 +155,8 @@ void Application::update(double dt)
 	l-shift
 	l-ctrl
 	*/
-	if (glfwGetKey(Window::getInstance()->getWindowHandle(), GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) mCamera.setFOV(mCamera.getFOV() - ZOOM_SPEED * dt);
-	else if (glfwGetKey(Window::getInstance()->getWindowHandle(), GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) mCamera.setFOV(mCamera.getFOV() + ZOOM_SPEED * dt);
+	if (glfwGetKey(Window::getInstance()->getWindowHandle(), GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) mCamera.zoom(-ZOOM_SPEED * dt);
+	else if (glfwGetKey(Window::getInstance()->getWindowHandle(), GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) mCamera.zoom(ZOOM_SPEED * dt);;
 
 	if (glfwGetKey(Window::getInstance()->getWindowHandle(), GLFW_KEY_W) == GLFW_PRESS) mCamera.move(0.0f, -MOVE_SPEED * dt);
 	else if (glfwGetKey(Window::getInstance()->getWindowHandle(), GLFW_KEY_S) == GLFW_PRESS) mCamera.move(0.0f, MOVE_SPEED * dt);
@@ -173,9 +183,9 @@ void Application::draw()
 	//  calculate scale for coin sprites
 	//float scaleX = coinSprites[currentFrame].getWidth() / (float)coinSprites[currentFrame].getHeight();
 	
-	model = glm::translate(model, coinPos);// *glm::scale(model, glm::vec3(scaleX, 1.0f, 1.0f));
+	model = glm::translate(model, coinPos);
 	view = mCamera.getViewMatrix();
-	projection = mCamera.getPerspective((float)Window::getInstance()->getWidth(), (float)Window::getInstance()->getHeight());
+	projection = mCamera.getOrtho();
 
 	mShaderProgram.use();
 	mShaderProgram.setUniform("model", model);
@@ -195,12 +205,12 @@ void Application::draw()
 	animController.draw();
 	
 
-	// now draw mario sprite
-	model = glm::translate(glm::mat4(), marioPos);
+	//// now draw mario sprite
+	//model = glm::translate(glm::mat4(), marioPos);
 
-	mShaderProgram.setUniform("model", model);
+	//mShaderProgram.setUniform("model", model);
 
-	marioSprite.draw();
+	//marioSprite.draw();
 
 	mShaderProgram.unUse();
 	glfwSwapBuffers(Window::getInstance()->getWindowHandle());

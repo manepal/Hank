@@ -10,15 +10,16 @@ public:
 	Camera();
 	~Camera();
 
-	glm::mat4 getViewMatrix() const;
-	glm::mat4 getPerspective(float width, float height) const;
+	const glm::mat4& getViewMatrix() const;
+	const glm::mat4& getPerspective() const;
+	const glm::mat4& getOrtho();
 
 	void move(float x, float y);
+	void zoom(float zoom);
 
 	// getters
-	float getFOV() const;
-	glm::vec3 getPosition() const;
-	glm::vec3 getTarget() const;
+	const glm::vec3& getPosition() const;
+	const glm::vec3& getTarget() const;
 
 	// setters
 	void setPosition(const glm::vec3& position);

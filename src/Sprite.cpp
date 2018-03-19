@@ -12,7 +12,6 @@ GLushort Sprite::mIndices[6] = {
 };
 
 Sprite::Sprite() :
-	mIsLoaded(false),
 	mVBO(0),
 	mIBO(0),
 	mVAO(0)
@@ -36,33 +35,56 @@ void Sprite::load(const std::string& texturePath)
 
 	// pass width and height as out parameters;
 	mTexture = ResourceManager::getTexture(texturePath);
-	mIsLoaded = mTexture != nullptr;
-	if (!mIsLoaded)
+	if (mTexture == nullptr)
 	{
 		std::cerr << "texture '" << mTexturePath << "' not loaded! sprite will not be initialized!" << std::endl;
 		return;
 	}
 
-	std::cout << "'" << mTexturePath << "':" << mTexture->getWidth() << "x" << mTexture->getHeight() << std::endl;
+	mWidth = mTexture->getWidth();
+	mHeight = mTexture->getHeight();
 
 	Vertex vertices[4];
+	//// top left
+	//vertices[0].setPosition(-1.0f, 1.0f);
+	//vertices[0].setUV(0.0f, 1.0f);
+	//vertices[0].setColor(255, 255, 255, 255);
+	//
+	//// top right
+	//vertices[1].setPosition(1.0f, 1.0f);
+	//vertices[1].setUV(1.0f, 1.0f);
+	//vertices[1].setColor(255, 255, 255, 255);
+	//
+	//// bottom right
+	//vertices[2].setPosition(1.0f, -1.0f);
+	//vertices[2].setUV(1.0f, 0.0f);
+	//vertices[2].setColor(255, 255, 255, 255);
+	//
+	//// bottom left
+	//vertices[3].setPosition(-1.0f, -1.0f);
+	//vertices[3].setUV(0.0f, 0.0f);
+	//vertices[3].setColor(255, 255, 255, 255);
+
+	float x = mWidth / 2.0f;
+	float y = mHeight / 2.0f;
+
 	// top left
-	vertices[0].setPosition(-1.0f, 1.0f);
+	vertices[0].setPosition(-x, y);
 	vertices[0].setUV(0.0f, 1.0f);
 	vertices[0].setColor(255, 255, 255, 255);
-	
+
 	// top right
-	vertices[1].setPosition(1.0f, 1.0f);
+	vertices[1].setPosition(x, y);
 	vertices[1].setUV(1.0f, 1.0f);
 	vertices[1].setColor(255, 255, 255, 255);
-	
+
 	// bottom right
-	vertices[2].setPosition(1.0f, -1.0f);
+	vertices[2].setPosition(x, -y);
 	vertices[2].setUV(1.0f, 0.0f);
 	vertices[2].setColor(255, 255, 255, 255);
-	
+
 	// bottom left
-	vertices[3].setPosition(-1.0f, -1.0f);
+	vertices[3].setPosition(-x, -y);
 	vertices[3].setUV(0.0f, 0.0f);
 	vertices[3].setColor(255, 255, 255, 255);
 
@@ -79,7 +101,7 @@ void Sprite::load(const std::string& texturePath)
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(mIndices), mIndices, GL_STATIC_DRAW);
 
 	// position attribute
-	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), nullptr);
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_TRUE, sizeof(Vertex), nullptr);
 	glEnableVertexAttribArray(0);
 
 	// texcoords attribute
@@ -96,7 +118,7 @@ void Sprite::load(const std::string& texturePath)
 
 void Sprite::draw()
 {
-	/*if (!mIsLoaded)
+	/*if (mTexture == nullptr)
 	{
 		return;
 	}

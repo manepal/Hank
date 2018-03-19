@@ -2,6 +2,7 @@
 
 #include <glm\gtc\matrix_transform.hpp>
 
+#include "Window.h"
 
 const glm::vec3 WORLD_UP = glm::vec3(0.0f, 1.0f, 0.0f);
 const float FOV = 45.0f;
@@ -18,30 +19,37 @@ Camera::~Camera()
 {
 }
 
-float Camera::getFOV() const
-{
-	return mFOV;
-}
-
-glm::vec3 Camera::getPosition() const
+const glm::vec3& Camera::getPosition() const
 {
 	return mPosition;
 }
 
-glm::vec3 Camera::getTarget() const
+const glm::vec3& Camera::getTarget() const
 {
 	return mTarget;
 }
 
-glm::mat4 Camera::getViewMatrix() const
+const glm::mat4& Camera::getViewMatrix() const
 {
 	return glm::lookAt(mPosition, mTarget, mUp);
 }
 
-glm::mat4 Camera::getPerspective(float width, float height) const
+const glm::mat4& Camera::getPerspective() const
 {
-	return glm::perspective(mFOV, width / height, 0.1f, 100.0f);
+	return glm::perspective(mFOV, Window::getInstance()->getWidth() / (float)Window::getInstance()->getHeight(), 0.1f, 100.0f);
 }
+
+const glm::mat4 & Camera::getOrtho()
+{
+	static float x = Window::getInstance()->getWidth() / 2.0f;
+	static float y = Window::getInstance()->getHeight() / 2.0f;
+
+	float zoom = mFOV / FOV;
+
+	return glm::ortho(-x * zoom, x * zoom, -y * zoom, y * zoom, 0.1f, 100.0f);
+}
+
+
 
 void Camera::move(float x, float y)
 {
@@ -49,6 +57,11 @@ void Camera::move(float x, float y)
 	mPosition.y += y;
 
 	updateCameraVectors();
+}
+
+void Camera::zoom(float zoom)
+{
+	mFOV += zoom;
 }
 
 void Camera::setPosition(const glm::vec3 & position)
