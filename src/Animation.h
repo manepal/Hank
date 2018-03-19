@@ -17,11 +17,11 @@ public:
 	// set interval in seconds
 	void setInterval(float interval);
 
+	void reset();
 	void update(float dt);
 	void draw();
 
 private:
-	float mCurrentTime;
 	float mInterval;
 	int mCurrentFrameIndex;
 

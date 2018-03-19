@@ -7,6 +7,7 @@
 #include <glm\gtc\matrix_transform.hpp>
 
 #include "Animation.h"
+#include "AnimationController.h"
 
 
 const float MAX_FPS = 1000.0f;
@@ -15,7 +16,10 @@ Sprite marioSprite;
 Sprite coinSprite;
 
 // ----------------- animation ------------------
-Animation animation(0.25f);
+AnimationController animController;
+std::shared_ptr<Animation> switchAnimation(new Animation(0.5f));
+std::shared_ptr<Animation> flagAnimation(new Animation(0.25f));
+std::shared_ptr<Animation> flyAnimation(new Animation(0.125f));
 
 glm::vec3 marioPos = glm::vec3(0.0f);
 glm::vec3 coinPos = glm::vec3(0.0f);
@@ -98,15 +102,28 @@ void Application::loadResources()
 	marioSprite.load("textures/mario.png");
 	coinSprite.load("textures/coin.png");
 
-	animation.addFrame("textures/animation/switchLeft.png");
-	animation.addFrame("textures/animation/switchMid.png");
-	animation.addFrame("textures/animation/switchRight.png");
-	animation.addFrame("textures/animation/switchMid.png");
+	switchAnimation->addFrame("textures/animation/switchLeft.png");
+	switchAnimation->addFrame("textures/animation/switchMid.png");
+	switchAnimation->addFrame("textures/animation/switchRight.png");
+	switchAnimation->addFrame("textures/animation/switchMid.png");
+
+	flagAnimation->addFrame("textures/animation/flagRed.png");
+	flagAnimation->addFrame("textures/animation/flagRed2.png");
+
+	flyAnimation->addFrame("textures/animation/flyFly1.png");
+	flyAnimation->addFrame("textures/animation/flyFly2.png");
+
+	animController.addAnimation("switch", switchAnimation);
+	animController.addAnimation("fly", flyAnimation);
+	animController.addAnimation("flag", flagAnimation);
 }
 
 void Application::update(double dt)
 {
-	animation.update(dt);
+	// use J, K, L to toggle animation
+	if (glfwGetKey(Window::getInstance()->getWindowHandle(), GLFW_KEY_J) == GLFW_PRESS) animController.setActiveAnimation("switch");
+	if (glfwGetKey(Window::getInstance()->getWindowHandle(), GLFW_KEY_K) == GLFW_PRESS) animController.setActiveAnimation("flag");
+	if (glfwGetKey(Window::getInstance()->getWindowHandle(), GLFW_KEY_L) == GLFW_PRESS) animController.setActiveAnimation("fly");
 
 	/*
 	- control player movement with directional keys.
@@ -136,6 +153,9 @@ void Application::update(double dt)
 
 	if (glfwGetKey(Window::getInstance()->getWindowHandle(), GLFW_KEY_A) == GLFW_PRESS) mCamera.move(MOVE_SPEED * dt, 0.0f);
 	else if (glfwGetKey(Window::getInstance()->getWindowHandle(), GLFW_KEY_D) == GLFW_PRESS) mCamera.move(-MOVE_SPEED * dt, 0.0f);
+
+	// update the animation controller
+	animController.update(dt);
 }
 
 void Application::draw()
@@ -172,7 +192,7 @@ void Application::draw()
 	//coinSprite.draw();
 
 	// ---------- animation ----------
-	animation.draw();
+	animController.draw();
 	
 
 	// now draw mario sprite

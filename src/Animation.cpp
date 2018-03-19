@@ -4,8 +4,7 @@
 
 Animation::Animation(float interval) :
 	mInterval(interval),
-	mCurrentFrameIndex(0),
-	mCurrentTime(0.0f)
+	mCurrentFrameIndex(0)
 {
 }
 
@@ -27,17 +26,22 @@ void Animation::setInterval(float interval)
 	mInterval = interval;
 }
 
+void Animation::reset()
+{
+	mCurrentFrameIndex = 0;
+}
+
 void Animation::update(float dt)
 {
-	static float previousTime = mCurrentTime;
-	mCurrentTime += dt;
-	float elapsedTime = mCurrentTime - previousTime;
+	static float duration = 0.0f;
 
-	if(elapsedTime >= mInterval)
+	duration += dt;
+
+	if(duration >= mInterval)
 	{
 		mCurrentFrameIndex++;
 		mCurrentFrameIndex %= mFrames.size();
-		previousTime = mCurrentTime;
+		duration = 0.0f;
 	}
 }
 

@@ -16,8 +16,8 @@ const std::shared_ptr<Texture2D> ResourceManager::getTexture(const std::string &
 	}
 
 	std::cout << "'" << texturePath << "' loaded from disk." << std::endl;
+	
 	std::shared_ptr<Texture2D> newTexture(new Texture2D);
-
 	if (newTexture->loadTexture(texturePath) == false)
 	{
 		return nullptr;
