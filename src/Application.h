@@ -26,8 +26,8 @@ private:
 	std::string mAppTitle; 
 	bool mIsFullscreen;
 
-	ShaderProgram mShaderProgram;
-	Camera mCamera;
+	BUZZ::ShaderProgram mShaderProgram;
+	BUZZ::Camera mCamera;
 
 	float mFPS;
 	float mFrameTime;

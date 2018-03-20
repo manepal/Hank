@@ -12,15 +12,15 @@
 
 const float MAX_FPS = 1000.0f;
 
-Sprite marioSprite;
-Sprite coinSprite;
+BUZZ::Sprite marioSprite;
+BUZZ::Sprite coinSprite;
 
 // ----------------- animation ------------------
-AnimationController animController;
-std::shared_ptr<Animation> switchAnimation(new Animation(0.5f));
-std::shared_ptr<Animation> flagAnimation(new Animation(0.25f));
-std::shared_ptr<Animation> flyAnimation(new Animation(0.125f));
-std::shared_ptr<Animation> coninAnimation(new Animation(0.05f));
+BUZZ::AnimationController animController;
+std::shared_ptr<BUZZ::Animation> switchAnimation(new BUZZ::Animation(0.5f));
+std::shared_ptr<BUZZ::Animation> flagAnimation(new BUZZ::Animation(0.25f));
+std::shared_ptr<BUZZ::Animation> flyAnimation(new BUZZ::Animation(0.125f));
+std::shared_ptr<BUZZ::Animation> coninAnimation(new BUZZ::Animation(0.05f));
 
 
 glm::vec3 marioPos = glm::vec3(0.0f);
@@ -63,7 +63,7 @@ bool Application::initialize()
 		return false;
 	}
 
-	if (!Window::getInstance()->initialize(mAppTitle, mWindowWidth, mWindowHeight, mIsFullscreen))
+	if (!BUZZ::Window::getInstance()->initialize(mAppTitle, mWindowWidth, mWindowHeight, mIsFullscreen))
 	{
 		cleanup();
 		return false;
@@ -81,7 +81,7 @@ bool Application::initialize()
 
 void Application::mainLoop()
 {
-	while (!glfwWindowShouldClose(Window::getInstance()->getWindowHandle()))
+	while (!glfwWindowShouldClose(BUZZ::Window::getInstance()->getWindowHandle()))
 	{
 		glfwPollEvents();
 
@@ -130,10 +130,10 @@ void Application::loadResources()
 void Application::update(double dt)
 {
 	// use I, J, K, L to toggle animation
-	if (glfwGetKey(Window::getInstance()->getWindowHandle(), GLFW_KEY_I) == GLFW_PRESS) animController.setActiveAnimation("coin");
-	if (glfwGetKey(Window::getInstance()->getWindowHandle(), GLFW_KEY_J) == GLFW_PRESS) animController.setActiveAnimation("switch");
-	if (glfwGetKey(Window::getInstance()->getWindowHandle(), GLFW_KEY_K) == GLFW_PRESS) animController.setActiveAnimation("flag");
-	if (glfwGetKey(Window::getInstance()->getWindowHandle(), GLFW_KEY_L) == GLFW_PRESS) animController.setActiveAnimation("fly");
+	if (glfwGetKey(BUZZ::Window::getInstance()->getWindowHandle(), GLFW_KEY_I) == GLFW_PRESS) animController.setActiveAnimation("coin");
+	if (glfwGetKey(BUZZ::Window::getInstance()->getWindowHandle(), GLFW_KEY_J) == GLFW_PRESS) animController.setActiveAnimation("switch");
+	if (glfwGetKey(BUZZ::Window::getInstance()->getWindowHandle(), GLFW_KEY_K) == GLFW_PRESS) animController.setActiveAnimation("flag");
+	if (glfwGetKey(BUZZ::Window::getInstance()->getWindowHandle(), GLFW_KEY_L) == GLFW_PRESS) animController.setActiveAnimation("fly");
 
 	/*
 	- control player movement with directional keys.
@@ -141,11 +141,11 @@ void Application::update(double dt)
 
 	LEFT  DOWN  RIGHT
 	*/
-	if (glfwGetKey(Window::getInstance()->getWindowHandle(), GLFW_KEY_RIGHT) == GLFW_PRESS) marioPos.x += MOVE_SPEED * dt;
-	else if (glfwGetKey(Window::getInstance()->getWindowHandle(), GLFW_KEY_LEFT) == GLFW_PRESS) marioPos.x -= MOVE_SPEED * dt;
+	if (glfwGetKey(BUZZ::Window::getInstance()->getWindowHandle(), GLFW_KEY_RIGHT) == GLFW_PRESS) marioPos.x += MOVE_SPEED * dt;
+	else if (glfwGetKey(BUZZ::Window::getInstance()->getWindowHandle(), GLFW_KEY_LEFT) == GLFW_PRESS) marioPos.x -= MOVE_SPEED * dt;
 
-	if (glfwGetKey(Window::getInstance()->getWindowHandle(), GLFW_KEY_UP) == GLFW_PRESS) marioPos.y += MOVE_SPEED * dt;
-	else if (glfwGetKey(Window::getInstance()->getWindowHandle(), GLFW_KEY_DOWN) == GLFW_PRESS) marioPos.y -= MOVE_SPEED * dt;
+	if (glfwGetKey(BUZZ::Window::getInstance()->getWindowHandle(), GLFW_KEY_UP) == GLFW_PRESS) marioPos.y += MOVE_SPEED * dt;
+	else if (glfwGetKey(BUZZ::Window::getInstance()->getWindowHandle(), GLFW_KEY_DOWN) == GLFW_PRESS) marioPos.y -= MOVE_SPEED * dt;
 
 	/*
 	- control camera movement with WASD keys.
@@ -155,14 +155,14 @@ void Application::update(double dt)
 	l-shift
 	l-ctrl
 	*/
-	if (glfwGetKey(Window::getInstance()->getWindowHandle(), GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) mCamera.zoom(-ZOOM_SPEED * dt);
-	else if (glfwGetKey(Window::getInstance()->getWindowHandle(), GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) mCamera.zoom(ZOOM_SPEED * dt);;
+	if (glfwGetKey(BUZZ::Window::getInstance()->getWindowHandle(), GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) mCamera.zoom(-ZOOM_SPEED * dt);
+	else if (glfwGetKey(BUZZ::Window::getInstance()->getWindowHandle(), GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) mCamera.zoom(ZOOM_SPEED * dt);;
 
-	if (glfwGetKey(Window::getInstance()->getWindowHandle(), GLFW_KEY_W) == GLFW_PRESS) mCamera.move(0.0f, -MOVE_SPEED * dt);
-	else if (glfwGetKey(Window::getInstance()->getWindowHandle(), GLFW_KEY_S) == GLFW_PRESS) mCamera.move(0.0f, MOVE_SPEED * dt);
+	if (glfwGetKey(BUZZ::Window::getInstance()->getWindowHandle(), GLFW_KEY_W) == GLFW_PRESS) mCamera.move(0.0f, -MOVE_SPEED * dt);
+	else if (glfwGetKey(BUZZ::Window::getInstance()->getWindowHandle(), GLFW_KEY_S) == GLFW_PRESS) mCamera.move(0.0f, MOVE_SPEED * dt);
 
-	if (glfwGetKey(Window::getInstance()->getWindowHandle(), GLFW_KEY_A) == GLFW_PRESS) mCamera.move(MOVE_SPEED * dt, 0.0f);
-	else if (glfwGetKey(Window::getInstance()->getWindowHandle(), GLFW_KEY_D) == GLFW_PRESS) mCamera.move(-MOVE_SPEED * dt, 0.0f);
+	if (glfwGetKey(BUZZ::Window::getInstance()->getWindowHandle(), GLFW_KEY_A) == GLFW_PRESS) mCamera.move(MOVE_SPEED * dt, 0.0f);
+	else if (glfwGetKey(BUZZ::Window::getInstance()->getWindowHandle(), GLFW_KEY_D) == GLFW_PRESS) mCamera.move(-MOVE_SPEED * dt, 0.0f);
 
 	// update the animation controller
 	animController.update(dt);
@@ -213,7 +213,7 @@ void Application::draw()
 	//marioSprite.draw();
 
 	mShaderProgram.unUse();
-	glfwSwapBuffers(Window::getInstance()->getWindowHandle());
+	glfwSwapBuffers(BUZZ::Window::getInstance()->getWindowHandle());
 }
 
 void Application::showFPS()
@@ -276,10 +276,10 @@ void Application::showFPS()
 		std::ostringstream outs;
 		outs.precision(3);
 		outs << std::fixed
-			<< ": " << Window::getInstance()->getWidth() << "x" << Window::getInstance()->getHeight() << "    "
+			<< ": " << BUZZ::Window::getInstance()->getWidth() << "x" << BUZZ::Window::getInstance()->getHeight() << "    "
 			<< "FPS: " << mFPS << "   ";
 
-		Window::getInstance()->appendTitle(outs.str());
+		BUZZ::Window::getInstance()->appendTitle(outs.str());
 
 		lastPrint = currentTime;
 	}
