@@ -8,9 +8,9 @@
 
 #include <string>
 
-#include "Camera.h"
-#include "ShaderProgram.h"
-#include "Window.h"
+#include <Buzz\Camera.h>
+#include <Buzz\ShaderProgram.h>
+#include <Buzz\Window.h>
 
 class Application
 {
@@ -23,7 +23,7 @@ public:
 private:
 	int mWindowWidth;
 	int mWindowHeight;
-	std::string mAppTitle;
+	std::string mAppTitle; 
 	bool mIsFullscreen;
 
 	ShaderProgram mShaderProgram;

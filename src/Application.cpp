@@ -6,8 +6,8 @@
 #include <glm\glm.hpp>
 #include <glm\gtc\matrix_transform.hpp>
 
-#include "Animation.h"
-#include "AnimationController.h"
+#include <Buzz\Animation.h>
+#include <Buzz\AnimationController.h>
 
 
 const float MAX_FPS = 1000.0f;
