@@ -9,9 +9,6 @@
 #include <Buzz\Animation.h>
 #include <Buzz\AnimationController.h>
 
-
-const float MAX_FPS = 1000.0f;
-
 BUZZ::Sprite marioSprite;
 BUZZ::Sprite coinSprite;
 
@@ -29,76 +26,15 @@ const float MOVE_SPEED = 100.0f;
 const float ZOOM_SPEED = 50.0f;
 
 
-Application::Application(const std::string& appTitle, int windowWidth, int windowHeight, bool fullscreen):
-	mAppTitle(appTitle),
-	mWindowWidth(windowWidth),
-	mWindowHeight(windowHeight),
-	mIsFullscreen(fullscreen)
+Application::Application()
 {
+	mAppTitle = "Adventure of Hank";
+	mWindowWidth = 1366;
+	mWindowHeight = 720;
+	mIsFullscreen = false;
 }
 
-Application::~Application()
-{
-}
-
-void Application::run()
-{
-	if (!initialize())
-	{
-		std::cerr << "failed to initialize application" << std::endl;
-		cleanup();
-		return;
-	}
-
-	loadResources();
-	mainLoop();
-	cleanup();
-}
-
-bool Application::initialize()
-{
-	if (!glfwInit())
-	{
-		std::cerr << "failed to initialize GLFW!" << std::endl;
-		return false;
-	}
-
-	if (!BUZZ::Window::getInstance()->initialize(mAppTitle, mWindowWidth, mWindowHeight, mIsFullscreen))
-	{
-		cleanup();
-		return false;
-	}
-
-	glewExperimental = GL_TRUE;
-	if (GLEW_OK != glewInit())
-	{
-		std::cerr << "failed to initialize GLEW!" << std::endl;
-		return false;
-	}
-
-	return true;
-}
-
-void Application::mainLoop()
-{
-	while (!glfwWindowShouldClose(BUZZ::Window::getInstance()->getWindowHandle()))
-	{
-		glfwPollEvents();
-
-		float currentFrameTime = glfwGetTime();
-
-		update(mFrameTime);
-		draw();
-		showFPS();
-	}
-}
-
-void Application::cleanup()
-{
-	glfwTerminate();
-}
-
-void Application::loadResources()
+void Application::startup()
 {
 	mShaderProgram.loadShaders("shaders/shader.vert.glsl", "shaders/shader.frag.glsl");
 	marioSprite.load("textures/mario.png");
@@ -124,10 +60,10 @@ void Application::loadResources()
 	animController.addAnimation("coin", coninAnimation);
 	animController.addAnimation("switch", switchAnimation);
 	animController.addAnimation("fly", flyAnimation);
-	animController.addAnimation("flag", flagAnimation);
+	animController.addAnimation("flag", flagAnimation);;
 }
 
-void Application::update(double dt)
+void Application::update(float dt)
 {
 	// use I, J, K, L to toggle animation
 	if (glfwGetKey(BUZZ::Window::getInstance()->getWindowHandle(), GLFW_KEY_I) == GLFW_PRESS) animController.setActiveAnimation("coin");
@@ -216,71 +152,6 @@ void Application::draw()
 	glfwSwapBuffers(BUZZ::Window::getInstance()->getWindowHandle());
 }
 
-void Application::showFPS()
+void Application::shutdown()
 {
-	static const int NUM_SAMPLES = 10;
-	static float frameTimes[NUM_SAMPLES];
-	static int currentFrame = 0;
-
-	static float previousTime = glfwGetTime();
-	
-	float currentTime;
-
-	// ---------- limit fps to max fps ----------
-	do
-	{
-		currentTime = glfwGetTime();
-		mFrameTime = currentTime - previousTime;
-	}
-	while (mFrameTime < 1.0f / MAX_FPS);
-	// ------------------------------------------
-
-	previousTime = currentTime;
-
-	frameTimes[currentFrame % NUM_SAMPLES] = mFrameTime;
-	
-	int numFrames;
-	currentFrame++;
-	if (currentFrame < NUM_SAMPLES)
-	{
-		numFrames = currentFrame;
-	}
-	else
-	{
-		numFrames = NUM_SAMPLES;
-	}
-
-	float frameTimeAverage = 0;
-	for (int i = 0; i < numFrames; i++)
-	{
-		frameTimeAverage += frameTimes[i];
-	}
-	frameTimeAverage = frameTimeAverage / numFrames;
-
-	if (frameTimeAverage > 0)
-	{
-		// time  is in seconds divide 1 frame by average time taken to render 1 frame
-		mFPS = 1.0f/ frameTimeAverage;
-	}
-	else
-	{
-		mFPS = 0.0f;
-	}
-
-	// display fps twice every second
-	static float lastPrint = currentTime;
-	float elapsedTime = currentTime - lastPrint;
-
-	if (elapsedTime >= 0.5f)
-	{
-		std::ostringstream outs;
-		outs.precision(3);
-		outs << std::fixed
-			<< ": " << BUZZ::Window::getInstance()->getWidth() << "x" << BUZZ::Window::getInstance()->getHeight() << "    "
-			<< "FPS: " << mFPS << "   ";
-
-		BUZZ::Window::getInstance()->appendTitle(outs.str());
-
-		lastPrint = currentTime;
-	}
 }

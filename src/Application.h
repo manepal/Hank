@@ -2,45 +2,26 @@
 #define APPLICATION_H
 
 
-#define GLEW_STATIC
-#include <GL\glew.h>
-#include <GLFW\glfw3.h>
-
 #include <string>
 
 #include <Buzz\Camera.h>
 #include <Buzz\ShaderProgram.h>
 #include <Buzz\Window.h>
+#include <Buzz\IApplication.h>
 
-class Application
+
+class Application : public BUZZ::IApplication
 {
 public:
-	 Application(const std::string& appTitle, int windowWidth, int windowHeight, bool fullscreen = false);
-	~Application();
+	 Application();
 
-	void run();
+	// Inherited via IApplication
+	virtual void startup() override;
+	virtual void update(float dt) override;
+	virtual void draw() override;
+	virtual void shutdown() override;
 
 private:
-	int mWindowWidth;
-	int mWindowHeight;
-	std::string mAppTitle; 
-	bool mIsFullscreen;
-
-	BUZZ::ShaderProgram mShaderProgram;
-	BUZZ::Camera mCamera;
-
-	float mFPS;
-	float mFrameTime;
-
-	bool initialize();
-	void mainLoop();
-	void cleanup();
-
-	void loadResources();
-	void update(double dt);
-	void draw();
-	void showFPS();
 };
-
 
 #endif // APPLICATION_H
