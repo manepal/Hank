@@ -1,4 +1,4 @@
-#include "Application.h"
+#include "PrototypeApplication.h"
 
 #include <iostream>
 #include <sstream>
@@ -26,15 +26,15 @@ const float MOVE_SPEED = 100.0f;
 const float ZOOM_SPEED = 50.0f;
 
 
-Application::Application()
+PrototypeApplication::PrototypeApplication()
 {
 	mAppTitle = "Adventure of Hank";
 	mWindowWidth = 1366;
-	mWindowHeight = 720;
+	mWindowHeight = 768;
 	mIsFullscreen = false;
 }
 
-void Application::startup()
+void PrototypeApplication::startup()
 {
 	mShaderProgram.loadShaders("shaders/shader.vert.glsl", "shaders/shader.frag.glsl");
 	marioSprite.load("textures/mario.png");
@@ -60,10 +60,10 @@ void Application::startup()
 	animController.addAnimation("coin", coninAnimation);
 	animController.addAnimation("switch", switchAnimation);
 	animController.addAnimation("fly", flyAnimation);
-	animController.addAnimation("flag", flagAnimation);;
+	animController.addAnimation("flag", flagAnimation);
 }
 
-void Application::update(float dt)
+void PrototypeApplication::update(float dt)
 {
 	// use I, J, K, L to toggle animation
 	if (glfwGetKey(BUZZ::Window::getInstance()->getWindowHandle(), GLFW_KEY_I) == GLFW_PRESS) animController.setActiveAnimation("coin");
@@ -104,13 +104,8 @@ void Application::update(float dt)
 	animController.update(dt);
 }
 
-void Application::draw()
+void PrototypeApplication::render()
 {
-	glClearColor(0.0f, 0.5f, 0.8f, 1.0f);
-	glClear(GL_COLOR_BUFFER_BIT);
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
 	glm::mat4 model;
 	glm::mat4 view;
 	glm::mat4 projection;
@@ -149,9 +144,8 @@ void Application::draw()
 	//marioSprite.draw();
 
 	mShaderProgram.unUse();
-	glfwSwapBuffers(BUZZ::Window::getInstance()->getWindowHandle());
 }
 
-void Application::shutdown()
+void PrototypeApplication::shutdown()
 {
 }

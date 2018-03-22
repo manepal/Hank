@@ -10,15 +10,15 @@
 #include <Buzz\IApplication.h>
 
 
-class Application : public BUZZ::IApplication
+class PrototypeApplication : public BUZZ::IApplication
 {
 public:
-	 Application();
+	 PrototypeApplication();
 
 	// Inherited via IApplication
 	virtual void startup() override;
 	virtual void update(float dt) override;
-	virtual void draw() override;
+	virtual void render() override;
 	virtual void shutdown() override;
 
 private:

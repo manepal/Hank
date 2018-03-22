@@ -1,4 +1,5 @@
-#include "Application.h"
+#include "HankApplication.h"
+#include "PrototypeApplication.h"
 
 #include <Buzz\Engine.h>
 
@@ -7,9 +8,10 @@
 int main()
 {
 	BUZZ::Engine* engine = BUZZ::Engine::getInstance();
-	Application app;
+	HankApplication hankApp;
+	PrototypeApplication prototype;
 
-	if (!engine->startup(&app))
+	if (!engine->startup(&hankApp))
 	{
 		engine->shutdown();
 		getchar();
