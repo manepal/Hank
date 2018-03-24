@@ -1,5 +1,6 @@
 #include "HankApplication.h"
 
+
 HankApplication::HankApplication()
 {
 	mAppTitle = "Adventure of Hank";

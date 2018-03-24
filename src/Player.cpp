@@ -16,6 +16,9 @@ Player::Player()
 
 	mScale.x = 1.0f;
 	mScale.y = 1.0f;
+
+	mWidth = 1.0f;
+	mHeight = 1.0f;
 }
 
 Player::Player(const vec2 & position, float rotation, const vec2 & scale)
@@ -74,12 +77,19 @@ void Player::draw()
 
 void Player::loadResources()
 {
+	mSprite.load();
+
+	mWidth = mSprite.getWidth();
+	mHeight = mSprite.getHeight();
+
 	std::shared_ptr<BUZZ::Animation> idle(new BUZZ::Animation(1.0f));
 	std::shared_ptr<BUZZ::Animation> walk(new BUZZ::Animation(0.075f));
 	std::shared_ptr<BUZZ::Animation> duck(new BUZZ::Animation(10.0f));
 	std::shared_ptr<BUZZ::Animation> jump(new BUZZ::Animation(10.0f));
 	
 	// add frames to idle animation
+	idle->addFrame("textures/Player/Idle/p1_front.png");
+	idle->addFrame("textures/Player/Idle/p1_front.png");
 	idle->addFrame("textures/Player/Idle/p1_front.png");
 	idle->addFrame("textures/player/Idle/p1_stand.png");
 

@@ -1,5 +1,5 @@
 #include "HankApplication.h"
-#include "PrototypeApplication.h"
+#include "B2TestApplication.h"
 
 #include <Buzz\Engine.h>
 
@@ -9,9 +9,9 @@ int main()
 {
 	BUZZ::Engine* engine = BUZZ::Engine::getInstance();
 	HankApplication hankApp;
-	PrototypeApplication prototype;
+	B2TestApplication b2App;
 
-	if (!engine->startup(&hankApp))
+	if (!engine->startup(&b2App))
 	{
 		engine->shutdown();
 		getchar();

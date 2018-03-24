@@ -24,10 +24,13 @@
     <ClCompile Include="src\HankApplication.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\PrototypeApplication.cpp">
+    <ClCompile Include="src\Player.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Player.cpp">
+    <ClCompile Include="src\B2TestApplication.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Physics.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -38,10 +41,16 @@
     <None Include="shaders\basic.vert.glsl">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="shaders\shader.frag.glsl">
+    <None Include="shaders\texture_shader.frag.glsl">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="shaders\shader.vert.glsl">
+    <None Include="shaders\texture_shader.vert.glsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="shaders\color_shader.frag.glsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="shaders\color_shader.vert.glsl">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>
@@ -49,10 +58,13 @@
     <ClInclude Include="src\HankApplication.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\PrototypeApplication.h">
+    <ClInclude Include="src\Player.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Player.h">
+    <ClInclude Include="src\B2TestApplication.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Physics.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
